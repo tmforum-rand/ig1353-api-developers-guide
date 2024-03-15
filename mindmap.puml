@@ -1,0 +1,85 @@
+@startmindmap
++[#Orange] <b>TMForum API\n<b>Development\n<b>Guidebook
+++ <b>Part 1</b>\nInitial\nOnboarding
++++ Prerequisites/\nGood to Know
+++++ Swagger/OAS Specifications and the REST API paradigm 
+++++ The API Design Guidelines
+++++ Microsoft VS Code
+++++ editor.swagger.io
+++++ TMForum Information Model Basics
++++++ Product, Service, Resource
++++++ Catalog, Order, Inventory
++++++ Party, PartyRole
+
++++ First-Time\nOnboarding
+++++ Registering on TMForum.org\nhttps://myaccount.tmforum.org/register
++++++ Setting up your Profile
++++++ Company SPOC Approval
+
+++++ Joining the API Programme\n(and workstreams) 
++++++ Access to Git, tmforum-rand organization
++++++ Confluence and JIRA:\nWhat, Where, How
+++++++ "Technical JIRAs"
+++++++ "Administrative JIRAs"
+++++ Team Meetings
++++++ Factory/Tooling
++++++ Programme Management
++++++ API Governance
++++++ Architecture
+
+++ <b>Part 2</b>\nDeveloping\na new API
++++ API Inception
++++ API Profile
++++ TMF API Number
++++ API Folder Layout
+++++ The "API Rules File"
+++++ The Schema Repository
+++++ Examples
+
+-- <b>Part 3</b>\nThe API\nDevelopment\nLoop
+--- An Aside: Epics, Documents, Technical JIRAs, Git Issues and Branching Strategy
+
+--- API Tools
+---- OAS Specification Generator
+---- PlantUML Diagram Generator
+---- User Guide Document Generator
+---- Conformance Profile Generator
+---- CTK Generation
+---- RI/Sample Code Generation
+--- How To
+---- Creating a Codespace
+----- The Editor
+----- The Web UI
+---- Rules file Deep Dive
+----- API Meta Data:\nName, Description, Version, BasePath
+----- List of Resources
+------ List of Operations
+------ Excluded Parameters:\nFVO and MVO
+------ List of Events
+------ List of Examples
+---- Diagrams Deep Dive
+---- User Guide Deep Dive
+----- Structure and Template
+----- Cover Page: Title, Version, Date, Status
+----- Examples
+----- Auxilliary Diagrams (Lifecycles)
+---- Troubleshooting
+
+---- Governance Checklists
+----- OAS
+------ Name, Number, Version, BasePath, Description
+------ Resources, Operations
+------ PATCH-able attributes
+------ Events
+----- User Guide
+------ Cover Page: Name, Title, Version, Date, Status
+------ Introduction: Template
+
+-- <b>Part 4</b>\nAdvanced API\nDevelopment
+--- ASyncAPI Specifications
+--- How to Make a DCS API
+---- What is DCS ...
+--- How to Make a Composite API
+---- What is a Composite API/Component Suite
+
+@endmindmap
