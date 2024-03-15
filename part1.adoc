@@ -1,0 +1,119 @@
+= TMForum API Developer's Handbook Part 1, Initial Onboarding
+TM Forum Specification
+Revision
+:Revision: 1.0.0
+:Date: 15-Mar-2024
+:IPR-Mode: RAND
+:TMF-Number: TODO
+:Status: DRAFT
+:Release-Status: Pre-production
+:url-repo: https://github.com/tmforum-rand/ig1353-api-developers-guide
+:doctype: book
+:toc: 
+
+== Executive Summary
+
+This “How To” document provides onboarding instructions and a user-guide for the TMForum Open-API development tools. The document is organized in multiple parts as follows:
+
+[options=header]
+|===
+|Document Part |Summary
+
+|*Part One: Initial Onboarding* |Prerequisites/Good To Know, First-Time Onboarding
+|*Part Two: Developing a New API* |API Inception, API Profile, Getting an API Number
+|*Part Three: The API Development Loop* |Admin: JIRA issues, Git issues and Branching, API Tools, How To Deep-Dives
+|*Part Four: Advanced API Development* |ASyncAPI Specifications, How to make a DCS API, How to make a Composite API
+|===
+
+
+This part (Part One) of the document provides a high-level overview and references of the background knowledge that you will need as you progress with TMForum API development, as well as the one-time registration details and permissions to get into the API "Author's Circle".
+
+:sectnums:
+== Prerequisities / Good to Know
+
+The TMForum uses a variaty of collaboration tools to coordinate the requirements and development of APIs:
+
+[options=header]
+|===
+|Document/Website |What Is It |Further Reading
+
+|Swagger/OAS files |The OpenAPI Specification (OAS) is a framework used by developers to build applications that interact with REST APIs. The specification defines how to communicate with an API, what information can be requested, and what information can be returned. | HTTP Link
+|TMF Forum API Design Guidelines |REST itself is only a paradigm. The TMForum has written down a number of 'positions' taken in the specific design of REST API specifications, such as Entity CRUD operations and Task operations, filtering and attribute selection and many more | HTTP Link
+|GitHub and Codespaces |GitHub is a website and cloud-based service that helps developers store and manage their code, as well as track and control changes to their code through Version control. | HTTP Link
+|Microsoft Visual Studio Code |GitHub Codespaces is a cloud-based development environment that allows developers to work on their local development environment on any device and from anywhere. Visual Studio Code is a rich text editor like Sublime Text and Atom. TMForum use a hosted browser-based version of this through Codespaces. | HTTP Link
+|editor.swagger.io |The Swagger Editor is an open source editor to design, define and document HTTP-based and event-driven APIs using the OpenAPI and AsyncAPI specifications, respectively. | https://editor.swagger.io
+|JIRA |https://www.atlassian.com/software/jira/guides/getting-started/introduction#what-is-jira-software[JIRA] from https://www.atlassian.com/[Atlassian] is used extensively for Project and Issue tracking. | HTTP Link
+|Confluence |*Confluence* also from from https://www.atlassian.com/[Atlassian] is used ... | HTTP Link
+|PlantUML | https://plantuml.com/[PlantUML] is a language and tool used to craft UML diagrams but textual description. Class diagrams are auto-generated in PlantUML, and auxillary diagrams (such as state transition diagrams) can be hand-coded by the author | HTTP Link
+|Postman |Postman is a tool that TMForum uses to act as a client, to exercise all mandatory aspects of their API specifications. This is used by vendors and operators to certify that their server-side implmentation meets the minimum necessary conformance to the specification. | HTTP Link
+
+|===
+
+
+=== TMForum Information Model Basics
+
+As a minimum, a high-level familiarity with the following information model concepts will be essential for your ability to author a TMForum API:
+
+* Products, Services and Resources
+* Catalog, Order, Inventory
+* Party and PartyRole
+
+
+== First-Time Onboarding
+
+Before you can begin coding an API, you first need to establish an identity and profile with the TMForum. While API deliverables are largely Apache V2.0 licenced and free, the internal development is made by TMForum members in closed GitHub repositories.
+
+=== Registering on TMForum.org
+
+The first step is to register yourself with https://www.tmforum.org/register. This is a one-time step. If you are a part of an existing member organization, you will need to register with your organizations domain name in your email address.
+
+=== Joining the API Programme
+
+Having established a profile, you now need to join the API Program. This is also a one-time step.
+
+=== Team Meetings
+
+At time of writing, the API team meets multiple times each week to discuss various aspects of the program. You are not obliged or expected to attend all of these, but it would be useful to "tune in" to the agendas, priorities and people involved:
+
+[options=header]
+|===
+|Day and Time |Meeting Title |Description
+
+|Monday @ 14:00 GMT/ 15:00 CET/ 10:00 ET|API Factory Call |Discussion of the issues and evolution of the tooling and end-to-end CI/CD process
+|Wednesday @ xxx |API Program Call |A weekly review of ongoing API developments and general planning (SpecJam etc)
+|Wednesday @ xxx |API Governance Call |A weekly review of new technical issues raised (improvements, bugs) in existing APIs
+|Thursday @ xxx |API Architecture Call |A technical discussion of design patterns that might impact our design guidelines
+
+|===
+
+== Administrative Appendix
+
+This Appendix provides additional background material about the TM Forum
+and this document. In general, sections may be included or omitted as
+desired, however a Document History must always be included.
+
+=== Document History
+
+==== Version History
+
+This section records the changes between this and the previous document
+version as it is edited by the team concerned. Note: this is an
+incremental number which does not have to match the release number and
+used for change control purposes only.
+
+[options=header]
+|===
+|Version Number |Date Modified |Modified by | Description of changes
+
+|0.1 |15-Mar-2024 | Stephen Harrop |First layout of the basics
+
+|===
+
+=== Acknowledgments
+
+This document was prepared by the members of the TM Forum API team:
+
+* Stephen Harrop, Vodafone, Editor
+* Revathi Sivaji, TM Forum, Contributor
+* Heidi Lobecker, TM Forum, Contributor
+* Uche Uba, TM Forum, Contributor
