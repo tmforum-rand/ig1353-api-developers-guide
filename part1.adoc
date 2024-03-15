@@ -33,7 +33,7 @@ This part (Part One) of the document provides a high-level overview and referenc
 
 The TMForum uses a variaty of collaboration tools to coordinate the requirements and development of APIs:
 
-[options=header]
+[options=header,stripes=even]
 |===
 |Document/Website |What Is It |Further Reading
 
@@ -65,24 +65,40 @@ Before you can begin coding an API, you first need to establish an identity and 
 
 === Registering on TMForum.org
 
-The first step is to register yourself with https://www.tmforum.org/register. This is a one-time step. If you are a part of an existing member organization, you will need to register with your organizations domain name in your email address.
+The first step is to register yourself with https://www.tmforum.org/register. This is a one-time step. If you are a part of an existing TMForum member organization, you will need to use your organization's domain name in the email address that you use to register.
+
+image::images/part1-register.png[Registration,400,400,align="center",link=https://www.tmforum.org/register,window=_blank]
+
+Each member organization has an individual allocated as a single point of contact for TMForum. It is possible that your application to register triggers an email approval to this person, internal to your company. It is worth confirming this with your organization's TMForum account manager to avoid any delay in your registration.
+
+=== Registering on TMForum.org
+
+Once you are registered, it is worth completing your profile by uploading a *Current Picture* (_jpg, gif or png_). This helps others to identify you in Confluence edits and JIRA issues.
 
 === Joining the API Programme
 
-Having established a profile, you now need to join the API Program. This is also a one-time step.
+Having registered and established a profile, you now need to join the API Program. This is also a one-time step. All TMForum projects are laid out here: https://myaccount.tmforum.org/joinproject. Scroll down this list to the *Open APIs* project and hit *JOIN THE PROJECT*:
+
+image::images/part1-join.png[Joining,400,400,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
+
+Once you have joined this button will become red and you can *VIEW PROJECT*:
+
+image::images/part1-viewProject.png[Joining,400,400,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
+
+This will take you to the API Project Home Page within TMForum.org (https://projects.tmforum.org/wiki/display/AP/Open+API+Project+Home). This is hosted in TMForum's private Confluence site. This home page wil lay out the people involved (this is where the photos are useful), the workstreams and team calendar (https://projects.tmforum.org/wiki/display/AP/Open+APIs+calendar). By joining the team you should receive calendar invites to each of the API program meetings.
 
 === Team Meetings
 
-At time of writing, the API team meets multiple times each week to discuss various aspects of the program. You are not obliged or expected to attend all of these, but it would be useful to "tune in" to the agendas, priorities and people involved:
+The most up-to-date list of meetings should be available from the above team home page. You are not obliged or expected to attend all of these, but it would be useful to "tune in" to the agendas, priorities and people involved. Some of the main recurring meetings are:
 
-[options=header]
+[options=header,cols="25h,~,~",stripes=even]
 |===
 |Day and Time |Meeting Title |Description
 
 |Monday @ 14:00 GMT/ 15:00 CET/ 10:00 ET|API Factory Call |Discussion of the issues and evolution of the tooling and end-to-end CI/CD process
-|Wednesday @ xxx |API Program Call |A weekly review of ongoing API developments and general planning (SpecJam etc)
-|Wednesday @ xxx |API Governance Call |A weekly review of new technical issues raised (improvements, bugs) in existing APIs
-|Thursday @ xxx |API Architecture Call |A technical discussion of design patterns that might impact our design guidelines
+|Wednesday @ 13:00 GMT/ 14:00 CET/ 09:00 ET|API Program Call |A weekly review of ongoing API developments and general planning (SpecJam etc)
+|Wednesday @ 14:00 GMT/ 15:00 CET/ 10:00 ET|API Governance Call |A weekly review of new technical issues raised (improvements, bugs) in existing APIs
+|Thursday @ 15:00 GMT/ 16:00 CET/ 11:00 ET|API Architecture Call |A technical discussion of design patterns that might impact our design guidelines
 
 |===
 
