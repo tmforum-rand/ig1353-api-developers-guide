@@ -1,6 +1,6 @@
 @startmindmap
 +[#Orange] <b>TMForum API\n<b>Development\n<b>Guidebook
-++ <b>Part 1</b>\nInitial\nOnboarding
+++ <b>[[part1.adoc Part 1]]</b>\nInitial\nOnboarding
 +++ Prerequisites/\nGood to Know
 ++++ Swagger/OAS Specifications and the REST API paradigm 
 ++++ The API Design Guidelines
@@ -37,18 +37,23 @@
 ++++ Examples
 
 -- <b>Part 3</b>\nThe API\nDevelopment\nLoop
---- An Aside: Epics, Documents, Technical JIRAs, Git Issues and Branching Strategy
+--- Managing Our Work
+---- API Epics: Tracking API Asset Production
+---- Technical JIRAs: The API Backlog
+---- Git Issues: The Tooling and CI/CD Backlog
+---- Branching Strategy and Pull Requests
 
---- API Tools
----- OAS Specification Generator
----- PlantUML Diagram Generator
----- User Guide Document Generator
----- Conformance Profile Generator
+--- The Production Process
+---- OAS Specification Generation
+---- PlantUML Diagram Generation
+---- User Guide Document Generation
+---- Conformance Profile Generation
 ---- CTK Generation
 ---- RI/Sample Code Generation
+---- The Publication Process
 --- How To
 ---- Creating a Codespace
------ The Editor
+----- The Code Editor
 ----- The Web UI
 ---- Rules file Deep Dive
 ----- API Meta Data:\nName, Description, Version, BasePath
