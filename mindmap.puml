@@ -27,7 +27,7 @@
 +++++ API Governance
 +++++ Architecture
 
-++ <b>Part 2</b>\nDeveloping\na new API
+++ <b>Part 2</b>\nDeveloping\na new APIDeveloping\na new API
 +++ API Inception
 +++ API Profile
 +++ TMF API Number
@@ -36,7 +36,7 @@
 ++++ The Schema Repository
 ++++ Examples
 
--- <b>Part 3</b>\nThe API\nDevelopment\nLoop
+-- <b>[[part3.adoc Part 3]]</b>\nThe API\nDevelopment\nLoop
 --- Managing Our Work
 ---- API Epics: Tracking API Asset Production
 ---- Technical JIRAs: The API Backlog
@@ -68,6 +68,7 @@
 ----- Cover Page: Title, Version, Date, Status
 ----- Examples
 ----- Auxilliary Diagrams (Lifecycles)
+---- Conformance Profile
 ---- Troubleshooting
 
 ---- Governance Checklists

@@ -1,0 +1,144 @@
+= TMForum API Developer's Handbook Part 3, The API Development Loop
+TM Forum Specification
+Revision
+:Revision: 1.0.0
+:Date: 18-Mar-2024
+:IPR-Mode: RAND
+:TMF-Number: TODO
+:Status: DRAFT
+:Release-Status: Pre-production
+:url-repo: https://github.com/tmforum-rand/ig1353-api-developers-guide
+:doctype: book
+:toc: 
+
+== Executive Summary
+
+This “How To” document set provides onboarding instructions and a user-guide for the TMForum Open-API development tools. The document is organized in multiple parts as follows:
+
+[options=header]
+|===
+|Document Part |Summary
+
+|*Part One: Initial Onboarding* |Prerequisites/Good To Know, First-Time Onboarding
+|*Part Two: Starting a New API* |API Inception, API Profile, Getting an API Number
+|*Part Three: The API Development Loop* |Admin: JIRA issues, Git issues and Branching, API Tools, How To Deep-Dives
+|*Part Four: Advanced API Development* |ASyncAPI Specifications, How to make a DCS API, How to make a Composite API
+|===
+
+
+This part (Part Three) of the document provides an overview of the API development process, the inputs expected by the API author and the use of the tools to generate the necessary documents.
+
+:sectnums:
+== Managing Our Work
+
+The TMForum uses a number of online collaboration tools to manage member's work across multiple companies and timezones. This includes weekly meetings, evolution of the API design patterns, API development progress and technical backlogs.
+
+=== Tracking API Asset Production
+
+* Use of JIRA, dashboards, EPICs
+
+=== Technical JIRAs: The API Backlog
+
+* Use of the "Component" attribute
+* Reviewed weekly: Only to get consensus on a direction
+* Making a report with JQL
+* Attaching the technical backlog to the API EPIC?
+
+=== Git Issues: The Tooling and CI/CD Backlog
+
+* Tooling is more code-centric, so more amenable to direct Git references as Git issues
+* Reviewed weekly
+
+== The Production Process
+
+Maybe this is just a sumamry table or a flow diagram:
+
+* OAS Specification Generation
+* PlantUML Diagram Generation
+* Confirmance Profile Generation
+* CTK Generation
+* RI/Sample Code Generation
+* The Publication Process
+
+== How To
+
+=== Creating a CodeSpace
+
+* TMForum pays for this
+* Make sure you are in the right repository, and the right branch
+* It lasts unattended for ~3-4 days?
+* Any unchecked work wil be lost
+
+=== Rules File Deep Dive
+
+* API meta data
+* List of Resources
+
+=== User Guide Deep Dive
+
+* Structure and Template
+* Cover Page: Title, Version, Date, Status
+* Examples
+* Auxillary Diagrams (Lifecycles)
+
+=== Conformance Profile Deep Dive
+
+* Initial Generation
+* How to read the file
+* How to craft a custom rule
+
+=== Troubleshooting
+
+* Codespace "Express" WebUI
+** Stops working
+** Generation problems: Looking at the underlying "log.log" file?
+** How to run the OAS and user-guide generation without the Express UI?
+* Examples are not currently validated against the OAS file
+
+=== Governance Checklists
+
+A table of quick visual tests on the details of the rules file and user guide
+As people often start a new rules file with a copy-n-paste from a previous existing file - it is easy for "working errors" to permiate unnoticed.
+
+* API Name: ("Management" convention?)
+* API Version: Following SemVer.org
+* API Description: Short/Concise: Avoid formatting and non-ASCII characters
+* Basepath/Server.URL: Do not use 'basePath' in the rules file - even though it is commonly copy-n-pasted from v4 rules files. It will not reflect in the OAS file.
+
+Schema files
+
+* Use of $ref: /definitions
+* Attribute descriptions: Be careful in Common/ to be 'generic'
+
+
+== Administrative Appendix
+
+This Appendix provides additional background material about the TM Forum
+and this document. In general, sections may be included or omitted as
+desired, however a Document History must always be included.
+
+=== Document History
+
+==== Version History
+
+This section records the changes between this and the previous document
+version as it is edited by the team concerned. Note: this is an
+incremental number which does not have to match the release number and
+used for change control purposes only.
+
+[options=header]
+|===
+|Version Number |Date Modified |Modified by | Description of changes
+
+|0.1 |18-Mar-2024 | Stephen Harrop |First layout of the basics
+
+|===
+
+=== Acknowledgments
+
+This document was prepared by the members of the TM Forum API team:
+
+* Stephen Harrop, Vodafone, Editor
+* Revathi Sivaji, TM Forum, Contributor
+* Heidi Lobecker, TM Forum, Contributor
+* Uche Uba, TM Forum, Contributor
