@@ -80,7 +80,7 @@ Always remember to check your work back into your branch before you leave, to av
 image::images/part3-repo.png[Repository,762,116,align="center",link=https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model,window=_blank]
 
 [start=2]
-. The left hand drop-down in the screenshot above indicates your current branch (shown as _v5.0.0-dev_). Click this and select the appropriate branch for your API work.
+. The left hand drop-down in the screenshot above indicates your current branch (shown as `v5.0.0-dev`). Click this and select the appropriate branch for your API work.
 . Now click the green "*<> Code*" button to the right. This will list any active codespaces that you may have, and allow you to create a new codespace on this current branch, by selecting the "+" button:
 
 image::images/part3-codespace-create.png[Codespace,685,370,align="center",link=https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model,window=_blank]
@@ -111,7 +111,9 @@ This link (https://docs.github.com/en/codespaces/getting-started/quickstart) des
 
 === Rules File Deep Dive
 
-The TMF API rules file, along with JSON schema files - form the main areas of influence in the construction of a TMF API. It is a YAML file, written in a Domain-Specific Language invented within the TMForum. Its purpose is to describe the structure of the generated OAS file, and it is the main input to the TMF OAS generator.
+The TMF API rules file, along with JSON schema files - form the main areas of influence in the construction of a TMF API. Your main activity will be in crafting this rules file together with the associated JSON-Schema files to ensure that the naming and description of entities, properties, operations, notifications and overall structure "hang together" to describe your intensions in agreement with the TMForum API Design Guidelines.
+
+The rules file is a YAML file (https://en.wikipedia.org/wiki/YAML), written in a Domain-Specific Language invented within the TMForum. Its purpose is to describe the high-level structure of the generated OAS file, and it is the main input to the TMF OAS generator.
 
 It describes:
 
@@ -122,6 +124,7 @@ It describes:
 *** For each operation a possible list of *excluded parameters* (for example, you would not expect to be able to POST a status attribute, so you might exclude this from the POST operation)
 ** A list of *notifications*. These are the events that the resource might emit (such as a state change event), that a subscriber might express an interest in.
 
+==== The API Meta Data
 The beginning  of the API rules file - describing the API metadata looks like this:
 [source, yaml]
 ----
@@ -143,9 +146,114 @@ api:
 <7> This is the version of your TMForum API. It follows the SemVer versioning format: <major>.<minor>.<patch>. It appears in the OAS file as attribute: *info.version*.
 
 WARNING: New API development is typically started by copying and pasting an existing, working rules file from another API directory. While this is fine, and encouraged - do take the time to go through the above line-by-line to ensure that you have updated the values to reflect your new API.
-Old API values are unlikely to throw tooling errors and will need to be caught by human review. If you take this review time up-front, it will prevent problems permiating the OAS file, User Guide and other published artefacts.
+Old API values are unlikely to throw tooling errors and will need to be caught by human review. If you take this review time up-front, it will prevent problems permeating the OAS file, User Guide and other published artifacts.
 
-The next section of the rules file describes the resouces of your API and the operations that you are allowing on them.
+==== The API Resources, Operations and Notifications
+
+The remaining section of the rules file describes the resources of your API and the operations that you are allowing on them. The high-level structure looks like this:
+[source, yaml]
+----
+resources:                                                                          <1>
+ - name: ResourceName                                                               <2>
+   schema: schemas/Tmf/<Domain>/ResourceName.schema.json#/definitions/ResourceName  <3>
+   examples:
+    - file: ./documentation/resource-samples/ResourceName.example.json              <4>
+   supportedHttpMethods:                                                            <5>
+     GET:
+       required: true                                                               <6>
+     POST:
+       required: true
+       requiredParameters:                                                          <7>
+        - description
+       parameterRestrictions:                                                       <8>
+        - id
+        - href
+        - status
+    notifications:                                                                  <9>
+     - name: create
+       schema: schemas/Tmf/<Domain>/Event/ResourceNameCreateEvent.schema.json#/definitions/ResourceNameCreateEvent
+----
+<1> In the above rules file section, we are describing a single resource (or "endpoint") in our API called `ResourceName`. In reality your API might have a number of resources exposed, in which case everything from (2) onwards would be repeated for each one.
+<2> This is the name of our resource being exposed. It will appear in the OAS file under the `paths` property as `/ResourceName`.
+<3> Each resource needs to have a single canonical schema, from which all variations are based (see later). This will sit in the `/schemas/Tmf/<Domain>` directory - where `<Domain>` is decided based on how your resources fits within the TMForum Information Model high-level domains (such as *Product*, *Service*, *Resource*, *EngagedParty*, *Common* - etc). This is likely to have been worked out during your API Inception phase by agreement with the TMForum.
+<4> Each main resource will have a full example laid out in the User Guide to help provide a context for the API developer who will be using this API.
+<5> The `supportedHttpMethods` node provides some combination of the operations that you are allowing on your resource: *GET*, *POST*, *PATCH* and *DELETE*.
+<6> For each operation, you can state whether this is required in every implementation of this API. For example, you might decide that a Trouble Ticket API does not make sense without the ability to at least *GET* one or more Trouble Tickets from a ticketing server implementation. In which case, you would state `required: true`. This has no direct translation to the generated OAS file, but the  operation will be mentioned as required in the user guide, and it will cause the TMForum Conformance Test Kit (CTK) to insist that this operation exists and is tested - in order to gain TMForum _conformance_ to this API.
+<7> For some operations (POST, PATCH), it can make sense to insist that certain properties are present in the submitted payload from the client. You might decide that an entity MUST at least have a _name_, _description_, _value_ or some combination - for it to make sense. In which case, you would list these properties under `requiredParameters`.
+<8> Conversely, you can also insist that certain properties from your canonical resource are *not* submitted by the client with POST-ing a payload. For example it is typically for the producer to decide on properties like *status* or *creationDate*. You would list these under `parameterRestrictions`.
+<9> Finally, the API implementation might chose to publish events when significant state transitions occur in its implementation. For example, Orders will typically move through a number of states (such as _acknowledged_, _inProgress_, _failed_, _done_) while processing, and other clients might chose to subscribe an interest in these state changes.
+
+The following operations may suggest these event notifications:
+[options=header]
+|===
+|Operation |Typical Event Notifications
+|GET | _none_
+|POST | createEvent, statusChangeEvent, 
+|PATCH | attributeValueChangeEvent
+|DELETE | deleteEvent
+
+|===
+
+NOTE: There are many opportunities to reference example files for the full resource and operation requests and responses. *These are all optional to the generation of the OAS file itself*. While they will be needed for the full publication of the API, its user guide and CTK - we would recommend focussing on the OAS construction and approval before working on the examples, as changes to the structure and schemas of the API will cause a lot of rework to these examples.
+
+==== JSON-Schema Files
+
+The rules file implicitly makes references to a number of schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing that JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file.
+
+A cut down TMForum JSON-Schema file for a `Document` entity looks like this:
+[source, json]
+----
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",                           <1>
+    "$id": "Document.schema.json",                                                  <2>
+    "title": "Document",                                                            <3>
+    "definitions": {
+        "Document": {                                                               <4>
+            "$id": "#Document",                                                     <5>
+            "type": "object",
+            "description": "Document is a tangible output from an activity",        <6>
+            "properties": {                                                         <7>
+                "characteristic": {                                                 <8>
+                    "type": "array",
+                    "items": {
+                        "$ref": "../Common/Characteristic.schema.json#Characteristic"
+                    }
+                },
+                "description": {
+                    "type": "string",
+                    "description": "free-text description of the document"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "A string used to give a name to the document"
+                }
+            },
+            "allOf": [                                                              <9>
+                {
+                    "$ref": "../Common/Entity.schema.json#/definitions/Entity"
+                }
+            ],
+            "required": [                                                           <10>
+                "name"
+            ]
+        }
+    }
+}
+----
+<1> This is the version of JSON-Schema grammar that is being followed
+<2> This is using the filename of the JSON-Schema file as the unique $id of this schema
+<3> This is the JSON-Schema name of the business entity
+<4> This is opening a schema definition for this entity
+<5> This is using the entity name of the JSON-Schema as the unique $id of this definition
+<6> This is the description of this business entity. Try to be concise, and imagine this text appearing as a "tooltip" in an IDE. 
+<7> The `properties` node contains the list of attributes and relationships associated with this entity definition.
+<8> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here.
+<9> All TMForum "managed entities" will typically include _all of_ the properties of the `Entity` schema. This makes them `Addressable` (so having an `id` and `href`) and Extensible (so having `@type`, `@baseType` and `@schemaLocation`).
+<10> The `required` section is an opportunity to list which of the above properties are "required" as a minimum to establish the main entity. In the above example you could say that a Document _is not a Document_ unless it at least has a `name` property.
+
+The JSON-Schema files are all laid out under the `/schemas` directory, where there are sub-directories for each of the domains from the TMForum Information Model ("_SID_"). Do take care when creating new entities to consider the right domain to place your JSON-Schema file.
+
+==== Generating an OAS file
 
 === User Guide Deep Dive
 
