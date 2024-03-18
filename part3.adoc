@@ -46,7 +46,7 @@ The TMForum uses a number of online collaboration tools to manage member's work 
 
 === Git Issues: The Tooling and CI/CD Backlog
 
-* Tooling is more code-centric, so more amenable to direct Git references as Git issues
+* Tooling is more code-centric, so more amenable to direct Git references and Git issues
 * Reviewed weekly
 
 == The Production Process
@@ -99,12 +99,53 @@ image::images/part3-codespace-app-running.png[Codespace,400,400,align="center",l
 
 This application presents a simplified menu-driven front-end to the API tooling. Hit "*Open in Browser*" to see this appear in another tab - but you can ignore it for now, we will get back to it later.
 
-Back in the main IDE tab: If you use Microsoft's Visual Studio Code IDE (https://code.visualstudio.com/), this will be a familiar layout, but presented through a web browser to an instance running in the Azure cloud, based on the TMForum v5 API repository. You can browse and modify files, and changes will be tracked for you to stage and commit from within the IDE.
+If you have ever closed this tab and need to recreate it, click on the *PORTS* tab at the bottom of the main IDE window. Here you should see a single *Port*: 3000 line with column titles of *Forwarded Address*, *Running Process*, *Visibility* and *Origin*. Hover your mouse over the URL under *Forwarded Address* and you should see a small globe icon (highlighted in the circle below):
+
+image::images/part3-codespace-port.png[Codespace,400,400,align="center",link=https://github.com/codespaces/allow_permissions,window=_blank]
+
+If you click on this globe icon, the Web UI tab should be recreated.
+
+*Back in the main IDE tab*: If you use Microsoft's Visual Studio Code IDE (https://code.visualstudio.com/), this will be a familiar layout, but presented through a web browser to an instance running in the Azure cloud, and looking at the TMForum v5 API repository. You can browse and modify files, and changes will be tracked for you to stage and commit from within the IDE back into this Git repository.
+
+This link (https://docs.github.com/en/codespaces/getting-started/quickstart) describes the basics of using Codespaces, including source control and extensions.
 
 === Rules File Deep Dive
 
-* API meta data
-* List of Resources
+The TMF API rules file, along with JSON schema files - form the main areas of influence in the construction of a TMF API. It is a YAML file, written in a Domain-Specific Language invented within the TMForum. Its purpose is to describe the structure of the generated OAS file, and it is the main input to the TMF OAS generator.
+
+It describes:
+
+* The API meta data: Its *name*, *TMF-number*, *description*, *version* and *hostUrl*
+* A list of *resources*, each having:
+** A list of *operations* (POST, PATCH, GET or DELETE) available on that resource
+*** For each operation a possible list of *examples*
+*** For each operation a possible list of *excluded parameters* (for example, you would not expect to be able to POST a status attribute, so you might exclude this from the POST operation)
+** A list of *notifications*. These are the events that the resource might emit (such as a state change event), that a subscriber might express an interest in.
+
+The beginning  of the API rules file - describing the API metadata looks like this:
+[source, yaml]
+----
+rulesVersion: 1.0.0                                         <1>
+api:
+  name:        MyAPI                                        <2>
+  shortName:   MyAPI                                        <3>
+  description: MyAPI description                            <4>
+  tmfId:       TMFxxx                                       <5>
+  hostUrl:     'https://serverRoot/tmf-api/MyAPI/v5/'       <6>
+  version:     5.0.0                                        <7>
+----
+<1> This is the *version of the rules file format itself* - not of the API under construction. It is used by the OAS generator to warn of any outdated syntax, and will change very infrequently
+<2> This is the name of your API. It will appear in the OAS file in the *info.title* attribute.
+<3> [TODO] shortName
+<4> This is the description of your API. It will appear in the OAS file in the *info.description* attribute. Try to keep this description fairly concise, avoid using formatting tags (as the text may appear in many formats: HTML, PDF and OAS rendering). Avoid use of special non-ASCII charcters (such as copyright, trademark symbols) as these can also trip-up later parsing.
+<5> This is the identity allocated by the TMForum to this API - typically in the form "TMFxxx" - where "xxx" is a three digit number. It has no direct translation into the OAS file, but will be used by the tooling in generation.
+<6> The *hostUrl* translates into the *servers.url* attribute of the OAS file. Note that previous TMF-v4 swagger rules files used a *basePath* attribute which is ignored in OAS file generation.
+<7> This is the version of your TMForum API. It follows the SemVer versioning format: <major>.<minor>.<patch>. It appears in the OAS file as attribute: *info.version*.
+
+WARNING: New API development is typically started by copying and pasting an existing, working rules file from another API directory. While this is fine, and encouraged - do take the time to go through the above line-by-line to ensure that you have updated the values to reflect your new API.
+Old API values are unlikely to throw tooling errors and will need to be caught by human review. If you take this review time up-front, it will prevent problems permiating the OAS file, User Guide and other published artefacts.
+
+The next section of the rules file describes the resouces of your API and the operations that you are allowing on them.
 
 === User Guide Deep Dive
 
