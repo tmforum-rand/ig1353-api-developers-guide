@@ -124,7 +124,7 @@ It describes:
 *** For each operation a possible list of *excluded parameters* (for example, you would not expect to be able to POST a status attribute, so you might exclude this from the POST operation)
 ** A list of *notifications*. These are the events that the resource might emit (such as a state change event), that a subscriber might express an interest in.
 
-==== The API Meta Data
+==== API Meta Data
 The beginning  of the API rules file - describing the API metadata looks like this:
 [source, yaml]
 ----
@@ -148,7 +148,7 @@ api:
 WARNING: New API development is typically started by copying and pasting an existing, working rules file from another API directory. While this is fine, and encouraged - do take the time to go through the above line-by-line to ensure that you have updated the values to reflect your new API.
 Old API values are unlikely to throw tooling errors and will need to be caught by human review. If you take this review time up-front, it will prevent problems permeating the OAS file, User Guide and other published artifacts.
 
-==== The API Resources, Operations and Notifications
+==== API Resources, Operations and Notifications
 
 The remaining section of the rules file describes the resources of your API and the operations that you are allowing on them. The high-level structure looks like this:
 [source, yaml]
@@ -198,7 +198,7 @@ NOTE: There are many opportunities to reference example files for the full resou
 
 ==== JSON-Schema Files
 
-The rules file implicitly makes references to a number of schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing that JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file.
+The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
 
 A cut down TMForum JSON-Schema file for a `Document` entity looks like this:
 [source, json]
