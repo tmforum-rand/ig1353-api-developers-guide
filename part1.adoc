@@ -67,7 +67,7 @@ Before you can begin coding an API, you first need to establish an identity and 
 
 The first step is to register yourself with https://www.tmforum.org/register. This is a one-time step. If you are a part of an existing TMForum member organization, you will need to use your organization's domain name in the email address that you use to register.
 
-image::images/part1-register.png[Registration,400,400,align="center",link=https://www.tmforum.org/register,window=_blank]
+image::images/part1-register.png[Registration,807,726,align="center",link=https://www.tmforum.org/register,window=_blank]
 
 Each member organization has an individual allocated as a single point of contact for TMForum. It is possible that your application to register triggers an email approval to this person, internal to your company. It is worth confirming this with your organization's TMForum account manager to avoid any delay in your registration.
 
@@ -79,11 +79,11 @@ Once you are registered, it is worth completing your profile by uploading a *Cur
 
 Having registered and established a profile, you now need to join the API Program. This is also a one-time step. All TMForum projects are laid out here: https://myaccount.tmforum.org/joinproject. Scroll down this list to the *Open APIs* project and hit *JOIN THE PROJECT*:
 
-image::images/part1-join.png[Joining,400,400,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
+image::images/part1-join.png[Joining,618,79,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
 
 Once you have joined this button will become red and you can *VIEW PROJECT*:
 
-image::images/part1-viewProject.png[Joining,400,400,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
+image::images/part1-viewProject.png[Joining,618,80,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
 
 This will take you to the API Project Home Page within TMForum.org (https://projects.tmforum.org/wiki/display/AP/Open+API+Project+Home). This is hosted in TMForum's private Confluence site. This home page wil lay out the people involved (this is where the photos are useful), the workstreams and team calendar (https://projects.tmforum.org/wiki/display/AP/Open+APIs+calendar). By joining the team you should receive calendar invites to each of the API program meetings.
 

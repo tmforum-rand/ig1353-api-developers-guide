@@ -68,7 +68,7 @@ Codespace (https://docs.github.com/en/codespaces/overview) is a development envi
 
 The TMForum pay for this hosting, and boundaries are set on how much RAM and CPU resource is allocated and how long the instance will remain when unattended. The codespace is created from an Ubuntu Linux image that includes popular languages and tools by default.
 
-image::images/part3-codespace.png[Codespaces,400,400,align="center",link=https://docs.github.com/en/codespaces/overview,window=_blank]
+image::images/part3-codespace.png[Codespaces,1440,1030,align="center",link=https://docs.github.com/en/codespaces/overview,window=_blank]
 
 WARNING: If you create a codespace and work on files locally within it - *and then leave it unattended for more than a few days*, Azure will delete the instance and any local work within it will be lost. Your GitHub registered email address will recieve warning emails from <noreply@github.com> as this deadline approaches.
 Always remember to check your work back into your branch before you leave, to avoid any loss.
@@ -77,31 +77,31 @@ Always remember to check your work back into your branch before you leave, to av
 
 . Having logged into GitHub.com with your TMForum registered identity, navigate to the v5 API repository: https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model
 
-image::images/part3-repo.png[Repository,400,400,align="center",link=https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model,window=_blank]
+image::images/part3-repo.png[Repository,762,116,align="center",link=https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model,window=_blank]
 
 [start=2]
 . The left hand drop-down in the screenshot above indicates your current branch (shown as _v5.0.0-dev_). Click this and select the appropriate branch for your API work.
 . Now click the green "*<> Code*" button to the right. This will list any active codespaces that you may have, and allow you to create a new codespace on this current branch, by selecting the "+" button:
 
-image::images/part3-codespace-create.png[Codespace,400,400,align="center",link=https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model,window=_blank]
+image::images/part3-codespace-create.png[Codespace,685,370,align="center",link=https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model,window=_blank]
 
 WARNING: Do make sure you are in the *right repository*, and the *right branch* before doing this - to ensure that GitHub spins up the right configuration for you.
 
 [start=4]
 . The codespace will request permissions related to spinning-up the Azure instance. Hit "*Authorize and continue*":
 
-image::images/part3-codespace-authorize.png[Codespace,400,400,align="center",link=https://github.com/codespaces/allow_permissions,window=_blank]
+image::images/part3-codespace-authorize.png[Codespace,550,367,align="center",link=https://github.com/codespaces/allow_permissions,window=_blank]
 
 [start=5]
 . The codespace will now start up, which may take a minute to produce the initial Microsoft Code IDE within your browser. It will take a further few minutes to run up a docker instance from the terminal window at the bottom. This will finish when the following popup appears in the bottom-right of the browser:
 
-image::images/part3-codespace-app-running.png[Codespace,400,400,align="center",link=https://github.com/codespaces/allow_permissions,window=_blank]
+image::images/part3-codespace-app-running.png[Codespace,456,115,align="center",link=https://github.com/codespaces/allow_permissions,window=_blank]
 
 This application presents a simplified menu-driven front-end to the API tooling. Hit "*Open in Browser*" to see this appear in another tab - but you can ignore it for now, we will get back to it later.
 
 If you have ever closed this tab and need to recreate it, click on the *PORTS* tab at the bottom of the main IDE window. Here you should see a single *Port*: 3000 line with column titles of *Forwarded Address*, *Running Process*, *Visibility* and *Origin*. Hover your mouse over the URL under *Forwarded Address* and you should see a small globe icon (highlighted in the circle below):
 
-image::images/part3-codespace-port.png[Codespace,400,400,align="center",link=https://github.com/codespaces/allow_permissions,window=_blank]
+image::images/part3-codespace-port.png[Codespace,900,108,align="center",link=https://github.com/codespaces/allow_permissions,window=_blank]
 
 If you click on this globe icon, the Web UI tab should be recreated.
 
