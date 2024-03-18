@@ -124,7 +124,7 @@ It describes:
 *** For each operation a possible list of *excluded parameters* (for example, you would not expect to be able to POST a status attribute, so you might exclude this from the POST operation)
 ** A list of *notifications*. These are the events that the resource might emit (such as a state change event), that a subscriber might express an interest in.
 
-==== API Meta Data
+==== *API Meta Data*
 The beginning  of the API rules file - describing the API metadata looks like this:
 [source, yaml]
 ----
@@ -148,7 +148,7 @@ api:
 WARNING: New API development is typically started by copying and pasting an existing, working rules file from another API directory. While this is fine, and encouraged - do take the time to go through the above line-by-line to ensure that you have updated the values to reflect your new API.
 Old API values are unlikely to throw tooling errors and will need to be caught by human review. If you take this review time up-front, it will prevent problems permeating the OAS file, User Guide and other published artifacts.
 
-==== API Resources, Operations and Notifications
+==== *API Resources, Operations and Notifications*
 
 The remaining section of the rules file describes the resources of your API and the operations that you are allowing on them. The high-level structure looks like this:
 [source, yaml]
@@ -196,7 +196,7 @@ The following operations may suggest these event notifications:
 
 NOTE: There are many opportunities to reference example files for the full resource and operation requests and responses. *These are all optional to the generation of the OAS file itself*. While they will be needed for the full publication of the API, its user guide and CTK - we would recommend focussing on the OAS construction and approval before working on the examples, as changes to the structure and schemas of the API will cause a lot of rework to these examples.
 
-==== JSON-Schema Files
+==== *JSON-Schema Files*
 
 The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
 
@@ -253,7 +253,10 @@ A cut down TMForum JSON-Schema file for a `Document` entity looks like this:
 
 The JSON-Schema files are all laid out under the `/schemas` directory, where there are sub-directories for each of the domains from the TMForum Information Model ("_SID_"). Do take care when creating new entities to consider the right domain to place your JSON-Schema file.
 
-==== Generating an OAS file
+==== *Generating an OAS file*
+
+* Using the Web UI from when the Cloudspace first spun-up, or if you don't have this available any more, see the end of section 3.1 [TODO: X-Ref]. This tab will present you with a simple Web UI with a drop-down list of APIs, one for every directory under `OAS_Open_API_And_Data_Model/apis`. Use this to find your API in the drop down list:
+
 
 === User Guide Deep Dive
 
