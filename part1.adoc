@@ -87,6 +87,21 @@ image::images/part1-viewProject.png[Joining,618,80,align="center",link=https://m
 
 This will take you to the API Project Home Page within TMForum.org (https://projects.tmforum.org/wiki/display/AP/Open+API+Project+Home). This is hosted in TMForum's private Confluence site. This home page wil lay out the people involved (this is where the photos are useful), the workstreams and team calendar (https://projects.tmforum.org/wiki/display/AP/Open+APIs+calendar). By joining the team you should receive calendar invites to each of the API program meetings.
 
+=== Joining the TMForum's Private GitHub Repository
+
+Independent of the collaboration tools, as an API author you will need access to TMForum's private v5 API Repository. If you have never used GitHub.com before, you will first need to establish an identity there. If this is your first time with GitHub.com:
+
+. From github.com, select "Sign Up" in the top-right hand corner
+. Enter an email address to register with. This need not be the same email as you have used to register with the TMForum website - it could (for example) be your personal email address.
+. Enter a strong password
+
+image::images/part1-github-reg.png[GitHub,573,385,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
+
+After establishing a GitHub identity - you will need to contact TMForum staff to ask that this is granted access rights to the `https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model` repository.
+
+This is currently done by emailing: Revathi Sivaji (`rsivaji@tmforum.org`) with your GitHub.com registered email address.
+
+
 === Team Meetings
 
 The most up-to-date list of meetings should be available from the above team home page. You are not obliged or expected to attend all of these, but it would be useful to "tune in" to the agendas, priorities and people involved. Some of the main recurring meetings are:
