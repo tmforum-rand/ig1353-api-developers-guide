@@ -1,0 +1,67 @@
+@startjson
+#highlight "lastName"
+#highlight "api" / "name"
+#highlight "api" / "resources" / "0" / "name"
+{
+  "rulesVersion": "1.0.0",
+  "api": {
+    "name": "MyAPI",
+    "shortName": "MyAPI",
+    "description": "This API describes...",
+    "tmfId": "TMFxxx",
+    "hostUrl": "https://serverRoot/tmf-api/document/v5/",
+    "version": "5.0.0",
+    "resources": [
+      {
+        "name": "MyResource",
+        "schema": ".../MyResource.schema.json",
+        "examples": [
+          {
+            "file": ".../Document.example.json"
+          }
+        ],
+        "supportedHttpMethods": {
+          "GET": {
+            "required": true
+          },
+          "PATCH": {
+            "required": true,
+            "parameterRestrictions": {
+              "excludedParameters": [
+                "id",
+                "href",
+                "@type",
+                "@baseType",
+                "@schemaLocation"
+              ]
+            }
+          },
+          "POST": {
+            "required": true,
+            "requiredParameters": [
+              "name"
+            ]
+          },
+          "DELETE": {
+            "required": true
+          }
+        },
+        "notifications": [
+          {
+            "name": "create",
+            "schema": ".../DocumentCreateEvent.schema.json"
+          },
+          {
+            "name": "change",
+            "schema": ".../DocumentChange.schema.json"
+          },
+          {
+            "name": "delete",
+            "schema": ".../DocumentDeleteEvent.schema.json"
+          }
+        ]
+      }
+    ]
+  }
+}
+@endjson

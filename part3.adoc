@@ -115,14 +115,19 @@ The TMF API rules file, along with JSON schema files - form the main areas of in
 
 The rules file is a YAML file (https://en.wikipedia.org/wiki/YAML), written in a Domain-Specific Language invented within the TMForum. Its purpose is to describe the high-level structure of the generated OAS file, and it is the main input to the TMF OAS generator.
 
-It describes:
+The high-level structure of a simple rules file is shown below. This describes:
 
-* The API meta data: Its *name*, *TMF-number*, *description*, *version* and *hostUrl*
-* A list of *resources*, each having:
-** A list of *operations* (POST, PATCH, GET or DELETE) available on that resource
-*** For each operation a possible list of *examples*
-*** For each operation a possible list of *excluded parameters* (for example, you would not expect to be able to POST a status attribute, so you might exclude this from the POST operation)
-** A list of *notifications*. These are the events that the resource might emit (such as a state change event), that a subscriber might express an interest in.
+- An API called `MyAPI` (highlighted)
+- With a single resource called `MyResource`  (highlighted)
+- This resource has four required operations: `GET`, `PATCH`, `POST` and `DELETE`
+- The `PATCH` operation does not allow `id`, `href`, `@type`, `@baseType` or `@schemaLocation` to be modified
+- The `POST` operation mandates the `name` attribute
+- The API can emit 3 notification types: `create`, `change` and `delete`
+
+[plantuml,json,svg,align="center"]
+----
+include::images/rules-structure.puml[]
+----
 
 ==== *API Meta Data*
 The beginning  of the API rules file - describing the API metadata looks like this:
@@ -138,12 +143,12 @@ api:
   version:     5.0.0                                        <7>
 ----
 <1> This is the *version of the rules file format itself* - not of the API under construction. It is used by the OAS generator to warn of any outdated syntax, and will change very infrequently
-<2> This is the name of your API. It will appear in the OAS file in the *info.title* attribute.
+<2> This is the name of your API. It will appear in the OAS file in the `info.title` attribute.
 <3> [TODO] shortName
-<4> This is the description of your API. It will appear in the OAS file in the *info.description* attribute. Try to keep this description fairly concise, avoid using formatting tags (as the text may appear in many formats: HTML, PDF and OAS rendering). Avoid use of special non-ASCII charcters (such as copyright, trademark symbols) as these can also trip-up later parsing.
+<4> This is the description of your API. It will appear in the OAS file in the `info.description` attribute. Try to keep this description fairly concise, avoid using formatting tags (as the text may appear in many formats: HTML, PDF and OAS rendering). Avoid use of special non-ASCII characters (such as copyright, trademark symbols) as these can also trip-up later parsing.
 <5> This is the identity allocated by the TMForum to this API - typically in the form "TMFxxx" - where "xxx" is a three digit number. It has no direct translation into the OAS file, but will be used by the tooling in generation.
-<6> The *hostUrl* translates into the *servers.url* attribute of the OAS file. Note that previous TMF-v4 swagger rules files used a *basePath* attribute which is ignored in OAS file generation.
-<7> This is the version of your TMForum API. It follows the SemVer versioning format: <major>.<minor>.<patch>. It appears in the OAS file as attribute: *info.version*.
+<6> The `hostUrl` translates into the `servers.url` attribute of the OAS file. Note that previous TMF-v4 swagger rules files used a `basePath` attribute which is ignored in OAS file generation.
+<7> This is the version of your TMForum API. It follows the SemVer (https://semver.org/) versioning format: *<major>.<minor>.<patch>*. This value appears in the OAS file as attribute: `info.version`.
 
 WARNING: New API development is typically started by copying and pasting an existing, working rules file from another API directory. While this is fine, and encouraged - do take the time to go through the above line-by-line to ensure that you have updated the values to reflect your new API.
 Old API values are unlikely to throw tooling errors and will need to be caught by human review. If you take this review time up-front, it will prevent problems permeating the OAS file, User Guide and other published artifacts.
