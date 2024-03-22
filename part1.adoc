@@ -99,7 +99,10 @@ image::images/part1-github-reg.png[GitHub,573,385,align="center",link=https://my
 
 After establishing a GitHub identity - you will need to contact TMForum staff to ask that this is granted access rights to the `https://github.com/tmforum-rand/OAS_Open_API_And_Data_Model` repository.
 
-This is currently done by emailing: Revathi Sivaji (`rsivaji@tmforum.org`) with your GitHub.com registered email address.
+This is currently done by filling out a simple request form accessed here with your GitHub.com registered email address:
+https://projects.tmforum.org/jira/servicedesk/customer/portal/3/create/102
+
+image::images/part1-github-request-form.png[Registration,414,508,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
 
 
 === Team Meetings
