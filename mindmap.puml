@@ -1,6 +1,6 @@
 @startmindmap
 +[#Orange] <b>TMForum API\n<b>Development\n<b>Guidebook
-++ <b>[[part1.adoc Part 1]]</b>\nInitial\nOnboarding
+++ <b>[[https://github.com/tmforum-rand/ig1353-api-developers-guide/blob/main/part1.adoc Part 1]]</b>\nInitial\nOnboarding
 +++ Prerequisites/\nGood to Know
 ++++ Swagger/OAS Specifications and the REST API paradigm 
 ++++ The API Design Guidelines
@@ -36,7 +36,7 @@
 ++++ The Schema Repository
 ++++ Examples
 
--- <b>[[part3.adoc Part 3]]</b>\nThe API\nDevelopment\nLoop
+-- <b>[[https://github.com/tmforum-rand/ig1353-api-developers-guide/blob/main/part3.adoc Part 3]]</b>\nThe API\nDevelopment\nLoop
 --- Managing Our Work
 ---- API Epics: Tracking API Asset Production
 ---- Technical JIRAs: The API Backlog
@@ -55,7 +55,7 @@
 ---- Creating a Codespace
 ----- The Code Editor
 ----- The Web UI
----- Rules file Deep Dive
+---- <b>[[https://github.com/tmforum-rand/ig1353-api-developers-guide/blob/main/part3.adoc#rules-file-deep-dive Rules file Deep Dive]]
 ----- API Meta Data:\nName, Description, Version, BasePath
 ----- List of Resources
 ------ List of Operations
