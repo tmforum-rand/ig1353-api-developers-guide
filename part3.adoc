@@ -221,7 +221,7 @@ A cut down TMForum JSON-Schema file for a `Document` entity looks like this:
                 "characteristic": {                                                 <8>
                     "type": "array",
                     "items": {
-                        "$ref": "../Common/Characteristic.schema.json#Characteristic"
+                        "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
                     }
                 },
                 "description": {
@@ -252,7 +252,7 @@ A cut down TMForum JSON-Schema file for a `Document` entity looks like this:
 <5> This is using the entity name of the JSON-Schema as the unique $id of this definition
 <6> This is the description of this business entity. Try to be concise, and imagine this text appearing as a "tooltip" in an IDE. 
 <7> The `properties` node contains the list of attributes and relationships associated with this entity definition.
-<8> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here.
+<8> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here. Note that there must be #/definitions anchor to the ref location as in this example : "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
 <9> All TMForum "managed entities" will typically include _all of_ the properties of the `Entity` schema. This makes them `Addressable` (so having an `id` and `href`) and Extensible (so having `@type`, `@baseType` and `@schemaLocation`).
 <10> The `required` section is an opportunity to list which of the above properties are "required" as a minimum to establish the main entity. In the above example you could say that a Document _is not a Document_ unless it at least has a `name` property.
 
