@@ -55,7 +55,7 @@ Maybe this is just a sumamry table or a flow diagram:
 
 * OAS Specification Generation
 * PlantUML Diagram Generation
-* Confirmance Profile Generation
+* Conformance Profile Generation
 * CTK Generation
 * RI/Sample Code Generation
 * The Publication Process
@@ -201,9 +201,28 @@ The following operations may suggest these event notifications:
 
 NOTE: There are many opportunities to reference example files for the full resource and operation requests and responses. *These are all optional to the generation of the OAS file itself*. While they will be needed for the full publication of the API, its user guide and CTK - we would recommend focussing on the OAS construction and approval before working on the examples, as changes to the structure and schemas of the API will cause a lot of rework to these examples.
 
-==== *JSON-Schema Files*
+==== *JSON-Schemas*
 
-The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
+The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files, each defining a JSON object type, until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
+
+*Schema Repository Structure*
+
+The schema files defining the JSON object types that make up the data structures that build up the API's resources are placed in the "*schemas*" directory structure located in the schema repository.
+
+Within that structure, schemas of TMF defined classes are placed in the "*Tmf*" subdirectory and further in the subdirectory named according to the domain *<Domain>* to which the class belongs.
+
+Following the above pattern for schema files for resources, the schema file defininig the JSON object type *<ObjectType>* is named according to the pattern `<ObjectType>.schema.json`.
+
+A schema file defining for an *<ObjectType>* an event *<Event>* is named `<ObjectType><Event>.schema.json`, and its payload is defined by a file `<ObjectType><Event>Payload.schema.json`. Both these kinds of files are placed in the "*Event*" subdirectory.
+
+Schema files for object types of a given *<DCS>* (Domain Context Specialization) are located in subdirectories named "*DCS*", with further a subdirectory for a given DCS, and the analogue sub-structure as for non-DCS TMF classes.
+
+The resulting directory structure is as follows:
+
+.Schema directory layout
+image::images/part3-schema-directory-structure.svg[layout of schema directory structure]
+
+*Schema File Structure*
 
 A cut down TMForum JSON-Schema file for a `Document` entity looks like this:
 [source, json]

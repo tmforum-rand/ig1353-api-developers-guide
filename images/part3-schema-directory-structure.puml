@@ -1,0 +1,25 @@
+@startsalt
+{
+{T
+ +<b>schemas</b>                                           | base directory for schema files
+ ++<b>Tmf</b>                                              | directory for TMF defined schemas 
+ +++<b>[Domain]</b>                                        | directory holding schemas of domain [Domain]
+ ++++<i>[ObjectType].schema.json</i>                       | schema file for object type [ObjectType]
+ ++++...
+ +++++<b>Event</b>                                         | subdirectory for event schemas
+ ++++++<i>[ObjectType][Event].schema.json</i>              | schema file for [ObjectType] related [Event] 
+ ++++++<i>[ObjectType][Event]Payload.schema.json</i>       | schema file for the event's payload
+ ++++++<i>...</i>
+ ++++<b>DCS</b>                                            | subdirectory for DCS schemas
+ +++++<b>[DCS]</b>                                         | subdirectory for a given [DCS]
+ ++++++<i>[DCS ObjectType].schema.json</i>                 | schema file for a [DCS ObjectType]
+ ++++++<i>...</i>
+ +++++++<b>Event</b>                                       | subdirectory for DCS event schemas
+ ++++++++<i>[DCS ObjectType][Event].schema.json</i>        | schema file for [DCS ObjectType] related [Event]
+ ++++++++<i>[DCS ObjectType][Event]Payload.schema.json</i> | schema file for the event's payload
+ ++++++++<b>...</b>
+ +++++<b>...</b>
+ +++<b>...</b>
+}
+}
+@endsalt
