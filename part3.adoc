@@ -2,14 +2,14 @@
 TM Forum Specification
 Revision
 :Revision: 1.0.0
-:Date: 16-Apr-2025
+:Date: 18-Mar-2024
 :IPR-Mode: RAND
 :TMF-Number: TODO
 :Status: DRAFT
 :Release-Status: Pre-production
 :url-repo: https://github.com/tmforum-rand/ig1353-api-developers-guide
 :doctype: book
-:toc:
+:toc: 
 
 == Executive Summary
 
@@ -64,7 +64,7 @@ Maybe this is just a sumamry table or a flow diagram:
 
 === Creating a CodeSpace
 
-Codespace (https://docs.github.com/en/codespaces/overview) is a development environment that is spun-up on request and hosted on your behalf in the Azure cloud by GitHub. This mitigates the technical problems caused by members having different in-house development environments, configurations, language/tool versions, and restrictive corporate firewalls.
+Codespace (https://docs.github.com/en/codespaces/overview) is a development environment that is spun-up on request and hosted on your behalf in the Azure cloud by GitHub. This mitigates the technical problems caused by members having different in-house development environments, configurations, language/tool versions, and restrictive corporate firewalls. 
 
 The TMForum pay for this hosting, and boundaries are set on how much RAM and CPU resource is allocated and how long the instance will remain when unattended. The codespace is created from an Ubuntu Linux image that includes popular languages and tools by default.
 
@@ -176,7 +176,7 @@ resources:                                                                      
         - status
     notifications:                                                                <9>
      - name: create
-       schema: schemas/Tmf/<Domain>/Event/<Resource>CreateEvent.schema.json#/definitions/<Resource>CreateEvent
+       schema: schemas/Tmf/<Domain>/Event/ResourceNameCreateEvent.schema.json#/definitions/ResourceNameCreateEvent
 ----
 <1> In the above rules file section, we are describing a single resource (or "endpoint") in our API called `ResourceName`. In reality your API might have a number of resources exposed, in which case everything from (2) onwards would be repeated for each one.
 <2> This is the name of our resource being exposed. It will appear in the OAS file under the `paths` property as `/ResourceName`.
@@ -193,7 +193,7 @@ The following operations may suggest these event notifications:
 |===
 |Operation |Typical Event Notifications
 |GET | _none_
-|POST | createEvent, statusChangeEvent,
+|POST | createEvent, statusChangeEvent, 
 |PATCH | attributeValueChangeEvent
 |DELETE | deleteEvent
 
