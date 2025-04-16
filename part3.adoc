@@ -9,7 +9,7 @@ Revision
 :Release-Status: Pre-production
 :url-repo: https://github.com/tmforum-rand/ig1353-api-developers-guide
 :doctype: book
-:toc: 
+:toc:
 
 == Executive Summary
 
@@ -64,7 +64,7 @@ Maybe this is just a sumamry table or a flow diagram:
 
 === Creating a CodeSpace
 
-Codespace (https://docs.github.com/en/codespaces/overview) is a development environment that is spun-up on request and hosted on your behalf in the Azure cloud by GitHub. This mitigates the technical problems caused by members having different in-house development environments, configurations, language/tool versions, and restrictive corporate firewalls. 
+Codespace (https://docs.github.com/en/codespaces/overview) is a development environment that is spun-up on request and hosted on your behalf in the Azure cloud by GitHub. This mitigates the technical problems caused by members having different in-house development environments, configurations, language/tool versions, and restrictive corporate firewalls.
 
 The TMForum pay for this hosting, and boundaries are set on how much RAM and CPU resource is allocated and how long the instance will remain when unattended. The codespace is created from an Ubuntu Linux image that includes popular languages and tools by default.
 
@@ -193,7 +193,7 @@ The following operations may suggest these event notifications:
 |===
 |Operation |Typical Event Notifications
 |GET | _none_
-|POST | createEvent, statusChangeEvent, 
+|POST | createEvent, statusChangeEvent,
 |PATCH | attributeValueChangeEvent
 |DELETE | deleteEvent
 
@@ -329,7 +329,7 @@ Further restrictions on numeric values can be `minimum`, `exclusiveMinimum`, `ma
 
 <12> A list of example values for an attribute can be provided.
 +
-Note that although JSON Schema supports an array of examples, Open API Specification only supports a single valued "example" element; thus only the first of the provided example values is copied to the OAS file. 
+Note that although JSON Schema supports an array of examples, Open API Specification only supports a single valued "example" element; thus only the first of the provided example values is copied to the OAS file.
 
 <13> A composite sub-entity defined in another JSON Schema file.
 
@@ -341,9 +341,11 @@ See below for the pattern defining the format of references.
 +
 Note that the according to the OpenAPI Specification, any sibling to a `$ref` reference shall be ignored. Tools like the https://editor.swagger.io/[swagger editor] will complain about this description, and use only the description coming from the referred schema.
 +
-Nevertheless, the TMF tooling copies this description into the API Specification (OAS file) and the API User Guide.  
+Nevertheless, the TMF tooling copies this description into the API Specification (OAS file) and the API User Guide.
 
 <16> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here. Collections are modelled as ordered `array` (thus having an array-index) of `items`.
++
+Note that there must be #/definitions anchor to the ref location as in this example : "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
 +
 Collections can further be restricted by `minItems`, `maxItems`, `uniqueItems`.
 
@@ -402,7 +404,7 @@ In the _API Rules files_, the reference to a resource's JSON Schema file is rela
   schema/Tmf/<Domain>/DCS/<Entity>.schema.json
   schema/Tmf/<Domain>/DCS/Event/<Entity><Event>.schema.json
 
-* For schemas of a specific <DCS>: 
+* For schemas of a specific <DCS>:
 
   schema/Tmf/<Domain>/DCS/<DCS>/<Entity>.schema.json
   schema/Tmf/<Domain>/DCS/<DCS>/Event/<Entity><Event>.schema.json
