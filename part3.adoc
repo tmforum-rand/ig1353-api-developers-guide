@@ -186,7 +186,7 @@ resources:                                                                      
 <6> For each operation, you can state whether this is required in every implementation of this API. For example, you might decide that a Trouble Ticket API does not make sense without the ability to at least *GET* one or more Trouble Tickets from a ticketing server implementation. In which case, you would state `required: true`. This has no direct translation to the generated OAS file, but the  operation will be mentioned as required in the user guide, and it will cause the TMForum Conformance Test Kit (CTK) to insist that this operation exists and is tested - in order to gain TMForum _conformance_ to this API.
 <7> For some operations (POST, PATCH), it can make sense to insist that certain properties are present in the submitted payload from the client. You might decide that an entity MUST at least have a _name_, _description_, _value_ or some combination - for it to make sense. In which case, you would list these properties under `requiredParameters`.
 <8> Conversely, you can also insist that certain properties from your canonical resource are *not* submitted by the client with POST-ing a payload. For example it is typically for the producer to decide on properties like *status* or *creationDate*. You would list these under `parameterRestrictions`.
-<9> Finally, the API implementation might chose to publish events when significant state transitions occur in its implementation. For example, Orders will typically move through a number of states (such as _acknowledged_, _inProgress_, _failed_, _done_) while processing, and other clients might chose to subscribe an interest in these state changes.
+<9> Finally, the API implementation might choose to publish events when significant state transitions occur in its implementation. For example, Orders will typically move through a number of states (such as _acknowledged_, _inProgress_, _failed_, _done_) while processing, and other clients might chose to subscribe an interest in these state changes.
 
 The following operations may suggest these event notifications:
 [options=header]
@@ -203,79 +203,171 @@ NOTE: There are many opportunities to reference example files for the full resou
 
 ==== *JSON-Schemas*
 
-The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files, each defining a JSON object type, until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
+The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files, each defining a JSON object type and representing a business entity, until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
 
 *Schema Repository Structure*
 
-The schema files defining the JSON object types that make up the data structures that build up the API's resources are placed in the "*schemas*" directory structure located in the schema repository.
+The schema files defining the business entities that build up the API's resources are placed in the schema repository with the "*schemas*" directory as its root.
 
-Within that structure, schemas of TMF defined classes are placed in the "*Tmf*" subdirectory and further in the subdirectory named according to the domain *<Domain>* to which the class belongs.
+Within that structure, schemas of TMF defined entities are placed in the "*Tmf*" subdirectory and further in the subdirectory named according to the TMForum Information Model ("_SID_") domain *<Domain>* to which the entity belongs. Do take care when creating new entities to consider the right domain to place your JSON-Schema file.
 
-Following the above pattern for schema files for resources, the schema file defininig the JSON object type *<ObjectType>* is named according to the pattern `<ObjectType>.schema.json`.
+Following the above pattern for schema files for resources, the schema file defining the entity *<Entity>* is named according to the pattern `<Entity>.schema.json`.
 
-A schema file defining for an *<ObjectType>* an event *<Event>* is named `<ObjectType><Event>.schema.json`, and its payload is defined by a file `<ObjectType><Event>Payload.schema.json`. Both these kinds of files are placed in the "*Event*" subdirectory.
+A schema file defining for an *<Entity>* an event *<Event>* is named `<Entity><Event>.schema.json`, and its payload is defined by a file `<Entity><Event>Payload.schema.json`. Both these kinds of files are placed in the "*Event*" subdirectory.
 
-Schema files for object types of a given *<DCS>* (Domain Context Specialization) are located in subdirectories named "*DCS*", with further a subdirectory for a given DCS, and the analogue sub-structure as for non-DCS TMF classes.
+Schema files for entities of a given *<DCS>* (Domain Context Specialization) are located in subdirectories named "*DCS*", with a further subdirectory for each DCS, and the analogue sub-structure as for non-DCS TMF classes.
 
 The resulting directory structure is as follows:
 
-.Schema directory layout
 image::images/part3-schema-directory-structure.svg[layout of schema directory structure]
 
 *Schema File Structure*
 
-A cut down TMForum JSON-Schema file for a `Document` entity looks like this:
+A cut down TMForum JSON-Schema file for a fictitious `Document` entity looks like this:
 [source, json]
 ----
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",                           <1>
-    "$id": "Document.schema.json",                                                  <2>
-    "title": "Document",                                                            <3>
-    "definitions": {
-        "Document": {                                                               <4>
-            "$id": "#Document",                                                     <5>
-            "type": "object",
-            "description": "Document is a tangible output from an activity",        <6>
-            "properties": {                                                         <7>
-                "characteristic": {                                                 <8>
-                    "type": "array",
-                    "items": {
-                        "$ref": "../Common/Characteristic.schema.json#Characteristic"
-                    }
-                },
-                "description": {
-                    "type": "string",
-                    "description": "free-text description of the document"
-                },
-                "name": {
-                    "type": "string",
-                    "description": "A string used to give a name to the document"
-                }
-            },
-            "allOf": [                                                              <9>
-                {
-                    "$ref": "../Common/Entity.schema.json#/definitions/Entity"
-                }
-            ],
-            "required": [                                                           <10>
-                "name"
-            ]
+  "$schema": "http://json-schema.org/draft-07/schema#",                               <1>
+  "$id": "Document.schema.json",                                                      <2>
+  "title": "Document",                                                                <3>
+  "definitions": {
+    "Document": {                                                                     <4>
+      "$id": "#Document",                                                             <5>
+      "type": "object",
+      "description": "Document is a tangible output from an activity",                <6>
+      "properties": {                                                                 <7>
+        "name": {                                                                     <8>
+          "type": "string",
+          "description": "A string used to give a name to the document"
+        },
+        "size": {                                                                     <9>
+          "type": "integer",
+          "description": "The size of the Document"
+        },
+        "isEncrypted": {                                                             <10>
+          "type": "boolean",
+          "description": "An example for a boolean attribute"
+        },
+        "creationDate": {                                                            <11>
+          "type": "string",
+          "format": "date-time",
+          "examples": [                                                              <12>
+            "2025-04-16T00:00:00Z"
+          ],
+          "description": "The date and time when the document was created"
+        },
+        "characteristic": {                                                          <13>
+          "type": "array",
+          "items": {
+            "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
+          }
         }
+      },
+      "allOf": [                                                                     <14>
+        {
+          "$ref": "../Common/Entity.schema.json#/definitions/Entity"
+        }
+      ],
+      "required": [ "name" ]                                                         <15>
     }
+  }
 }
 ----
-<1> This is the version of JSON-Schema grammar that is being followed
-<2> This is using the filename of the JSON-Schema file as the unique $id of this schema
-<3> This is the JSON-Schema name of the business entity
-<4> This is opening a schema definition for this entity
-<5> This is using the entity name of the JSON-Schema as the unique $id of this definition
-<6> This is the description of this business entity. Try to be concise, and imagine this text appearing as a "tooltip" in an IDE. 
-<7> The `properties` node contains the list of attributes and relationships associated with this entity definition.
-<8> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here.
-<9> All TMForum "managed entities" will typically include _all of_ the properties of the `Entity` schema. This makes them `Addressable` (so having an `id` and `href`) and Extensible (so having `@type`, `@baseType` and `@schemaLocation`).
-<10> The `required` section is an opportunity to list which of the above properties are "required" as a minimum to establish the main entity. In the above example you could say that a Document _is not a Document_ unless it at least has a `name` property.
 
-The JSON-Schema files are all laid out under the `/schemas` directory, where there are sub-directories for each of the domains from the TMForum Information Model ("_SID_"). Do take care when creating new entities to consider the right domain to place your JSON-Schema file.
+Representing the name of the entity as <Entity>, the elements of the schema are:
+
+<1> This is the version of JSON-Schema grammar that is being followed.
++
+Fixed value, no [Entity] dependence.
+Note that we are using https://json-schema.org/draft-07[Draft-07 of JSON Schema].
+
+<2> This is using the filename of the JSON-Schema file as the unique $id of this schema.
++
+MUST fit the pattern `[Entity].schema.json`.
+
+<3> This is the JSON-Schema name of the business entity.
++
+MUST fit the pattern `[Entity]`.
+
+<4> This is opening the schema definition for this entity.
++
+MUST fit the pattern `[Entity]`.
++
+Note that this name together with its location within the schema is used in `$ref` references to this entity as target of the JSON Pointer, i.e. as `/definitions/[Entity]`.
+
+<5> This is using the entity name of the JSON-Schema as the unique $id of this definition
++
+MUST fit the pattern `#[Entity]`.
++
+<6> This is the description of this business entity.
++
+This description is copied into the API Specification (OAS file) and the API User Guide.
++
+Try to be concise, and imagine this text appearing as a "tooltip" in an IDE. Note also that it appears in all APIs that directly or indirectly refer to this entity, so it should explain the entity without referring to the context of the rules file or schema file referring to it.
+
+<7> The `properties` node contains the list of attributes and relationships associated with this entity definition.
+
+<8> This `name` is a simple string attribute with no further restriction. Its description - as that of all attributes - is copied into the API Specification (OAS file) and the API User Guide and is used for display by tools like IDEs.
++
+More specific definitions can be achieved by adding a `format`, e.g. `uri`, `uri-reference` and similar.
++
+The values of string attributes can be further restricted by adding any of `minLength`, `maxLength`, `pattern` (a regular expression), `enum` (with a list of allowed values).
+
+<9> Numeric attribute definitions can be typed as `integer` or `number`.
++
+The `format` keyword can be used to define an `integer` more specific as `int32` or `int64`, and a `number` as `float` or `double`.
++
+Further restrictions on numeric values can be `minimum`, `exclusiveMinimum`, `maximum`, `exclusiveMinimum`, `enum` (with a list of allowed values).
+
+<10> Boolean attributes can take on the values `true` and `false`.
+
+<11> Date and time attributes are modelled as type `string` with a `format`, possible values are `date`, `time` and `date-time`.
+
+<12> A list of example values for an attribute can be provided.
++
+Note that although JSON Schema supports an array of examples, Open API Specification only supports a single valued "example" element; thus only the first of the provided example values is copied to the OAS file. 
+
+<13> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here. See below for the pattern defining the format of references. Collections are modelled as ordered `array` (thus having an array-index) of `items`.
++
+Collections can further be restricted by `minItems`, `maxItems`, `uniqueItems`.
+
+<14> Many TMForum "managed entities" typically include _all of_ the properties of the `Entity` schema. This makes them `Addressable` (having an `id` and `href`) and Extensible (having `@type`, `@baseType` and `@schemaLocation`). Other "base" entities can also be used to realize more "specialized" entities.
++
+A common mistake is to add a `description` to a `$ref`; such descriptions are generally ignored by tools like IDEs. 
+
+<15> The `required` section is an opportunity to list which of the above properties are "required" as a minimum to establish the main entity. In the above example you could say that a Document _is not a Document_ unless it at least has a `name` property.
+
+<16> In some cases (see the following example), a schema is defined as a _one of_ choice between several alternative structures.
+
+An example of a TMForum JSON-Schema modelling a choice looks like this:
+[source, json]
+----
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "DocumentRefOrValue.schema.json",
+  "title": "DocumentRefOrValue",
+  "definitions": {
+    "DocumentRefOrValue": {
+      "$id": "#DocumentRefOrValue",
+      "type": "object",
+      "description": "A Document provided by reference or by value",
+      "oneOf": [                                                                     <16>
+        {
+          "$ref": "../Common/Document.schema.json#/definitions/Document"
+        },
+        {
+          "$ref": "../Common/DocumentRef.schema.json#/definitions/DocumentRef"
+        }
+      ]
+    }
+  }
+}
+----
+
+*Reference structure*
+
+TO BE DONE
+
 
 ==== *Generating an OAS file*
 
