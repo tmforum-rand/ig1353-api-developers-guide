@@ -158,25 +158,25 @@ Old API values are unlikely to throw tooling errors and will need to be caught b
 The remaining section of the rules file describes the resources of your API and the operations that you are allowing on them. The high-level structure looks like this:
 [source, yaml]
 ----
-resources:                                                                          <1>
- - name: ResourceName                                                               <2>
-   schema: schemas/Tmf/<Domain>/ResourceName.schema.json#/definitions/ResourceName  <3>
+resources:                                                                              <1>
+ - name: <ResourceName>                                                                 <2>
+   schema: schemas/Tmf/<Domain>/<ResourceName>.schema.json#/definitions/<ResourceName>  <3>
    examples:
-    - file: ./documentation/resource-samples/ResourceName.example.json              <4>
-   supportedHttpMethods:                                                            <5>
+    - file: ./documentation/resource-samples/<ResourceName>.example.json                <4>
+   supportedHttpMethods:                                                                <5>
      GET:
-       required: true                                                               <6>
+       required: true                                                                   <6>
      POST:
        required: true
-       requiredParameters:                                                          <7>
+       requiredParameters:                                                              <7>
         - description
-       parameterRestrictions:                                                       <8>
+       parameterRestrictions:                                                           <8>
         - id
         - href
         - status
-    notifications:                                                                  <9>
+    notifications:                                                                      <9>
      - name: create
-       schema: schemas/Tmf/<Domain>/Event/ResourceNameCreateEvent.schema.json#/definitions/ResourceNameCreateEvent
+       schema: schemas/Tmf/<Domain>/Event/<ResourceName>CreateEvent.schema.json#/definitions/<ResourceName>CreateEvent
 ----
 <1> In the above rules file section, we are describing a single resource (or "endpoint") in our API called `ResourceName`. In reality your API might have a number of resources exposed, in which case everything from (2) onwards would be repeated for each one.
 <2> This is the name of our resource being exposed. It will appear in the OAS file under the `paths` property as `/ResourceName`.
@@ -203,7 +203,7 @@ NOTE: There are many opportunities to reference example files for the full resou
 
 ==== *JSON-Schemas*
 
-The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files, each defining a JSON object type and representing a business entity, until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
+The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above as well as each event type named under the `notifications:` section will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files, each defining a JSON object type and representing a business entity, until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
 
 *Schema Repository Structure*
 
@@ -256,19 +256,23 @@ A cut down TMForum JSON-Schema file for a fictitious `Document` entity looks lik
           ],
           "description": "The date and time when the document was created"
         },
-        "characteristic": {                                                          <13>
+        "validFor" : {                                                               <13>
+          "$ref": "../Common/TimePeriod.schema.json#/definitions/TimePeriod",        <14>
+          "description": "The period of time during which this Document is valid"    <15>
+        },
+        "characteristic": {                                                          <16>
           "type": "array",
           "items": {
             "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
           }
         }
       },
-      "allOf": [                                                                     <14>
+      "allOf": [                                                                     <17>
         {
           "$ref": "../Common/Entity.schema.json#/definitions/Entity"
         }
       ],
-      "required": [ "name" ]                                                         <15>
+      "required": [ "name" ]                                                         <18>
     }
   }
 }
@@ -327,17 +331,27 @@ Further restrictions on numeric values can be `minimum`, `exclusiveMinimum`, `ma
 +
 Note that although JSON Schema supports an array of examples, Open API Specification only supports a single valued "example" element; thus only the first of the provided example values is copied to the OAS file. 
 
-<13> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here. See below for the pattern defining the format of references. Collections are modelled as ordered `array` (thus having an array-index) of `items`.
+<13> A composite sub-entity defined in another JSON Schema file.
+
+<14> The reference to the JSON Schema file defining the sub-entity.
++
+See below for the pattern defining the format of references.
+
+<15> The description of the sub-entity in context of this entity.
++
+Note that the according to the OpenAPI Specification, any sibling to a `$ref` reference shall be ignored. Tools like the https://editor.swagger.io/[swagger editor] will complain about this description, and use only the description coming from the referred schema.
++
+Nevertheless, the TMF tooling copies this description into the API Specification (OAS file) and the API User Guide.  
+
+<16> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here. Collections are modelled as ordered `array` (thus having an array-index) of `items`.
 +
 Collections can further be restricted by `minItems`, `maxItems`, `uniqueItems`.
 
-<14> Many TMForum "managed entities" typically include _all of_ the properties of the `Entity` schema. This makes them `Addressable` (having an `id` and `href`) and Extensible (having `@type`, `@baseType` and `@schemaLocation`). Other "base" entities can also be used to realize more "specialized" entities.
-+
-A common mistake is to add a `description` to a `$ref`; such descriptions are generally ignored by tools like IDEs. 
+<17> Many TMForum "managed entities" typically include _all of_ the properties of the `Entity` schema. This makes them `Addressable` (having an `id` and `href`) and Extensible (having `@type`, `@baseType` and `@schemaLocation`). Other "base" entities can also be used to realize more "specialized" entities.
 
-<15> The `required` section is an opportunity to list which of the above properties are "required" as a minimum to establish the main entity. In the above example you could say that a Document _is not a Document_ unless it at least has a `name` property.
+<18> The `required` section is an opportunity to list which of the above properties are "required" as a minimum to establish the main entity. In the above example you could say that a Document _is not a Document_ unless it at least has a `name` property.
 
-<16> In some cases (see the following example), a schema is defined as a _one of_ choice between several alternative structures.
+<19> In some cases (see the following example), a schema is defined as a _one of_ choice between several alternative structures.
 
 An example of a TMForum JSON-Schema modelling a choice looks like this:
 [source, json]
@@ -351,7 +365,7 @@ An example of a TMForum JSON-Schema modelling a choice looks like this:
       "$id": "#DocumentRefOrValue",
       "type": "object",
       "description": "A Document provided by reference or by value",
-      "oneOf": [                                                                     <16>
+      "oneOf": [                                                                     <19>
         {
           "$ref": "../Common/Document.schema.json#/definitions/Document"
         },
@@ -364,10 +378,69 @@ An example of a TMForum JSON-Schema modelling a choice looks like this:
 }
 ----
 
-*Reference structure*
+*Format of References*
 
-TO BE DONE
+References JSON Schema file containing entity definitions exist in the API Rules Files as well as in the JSON Schema files, and by the TMF tooling are resolved recursively to generate the API's OAS file. TMF OpenAPIs apply the https://spec.openapis.org/oas/v3.0.1[OpenAPI Specification 3.0.1], so that the details of that OAS version must be considered.
 
+For OAS 3.0, reference resolution is accomplished as defined by the https://datatracker.ietf.org/doc/html/draft-pbryan-zyp-json-ref-03[JSON Reference] specification and not by the JSON Schema specification.
+
+The "$ref" string value contains a https://datatracker.ietf.org/doc/html/rfc3986#section-4.1[URI-reference], which identifies the location of the JSON value being referenced.
+
+Within the TMF OpenAPI repository, only https://datatracker.ietf.org/doc/html/rfc3986#section-4.2[Relative References] of type "no-scheme" are used. It consists of a relative _path part_, i.e. a sequence of path segments separated by, but not starting with a slash ("/") character, followed by a hash ("#") character as separater and a _fragment part_.
+
+_Path-Part_
+
+In the _API Rules files_, the reference to a resource's JSON Schema file is relative to the root of the OpenAPI repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>`). Following the above defined Schema Repository Structure, its path part begins with `schema/Tmf/<Domain>`, possibly followed by `DCS`, specific `<DCS>` and/or `Event` segments, and the schema file name `<Entity>.schema.json`, resulting in any of the following alternatives:
+
+* References to a standard <Entity> or related <Event> schema file:
+
+  schema/Tmf/<Domain>/<Entity>.schema.json
+  schema/Tmf/<Domain>/Event/<Entity><Event>.schema.json
+
+* For DCS schemas shared by several DCSs:
+
+  schema/Tmf/<Domain>/DCS/<Entity>.schema.json
+  schema/Tmf/<Domain>/DCS/Event/<Entity><Event>.schema.json
+
+* For schemas of a specific <DCS>: 
+
+  schema/Tmf/<Domain>/DCS/<DCS>/<Entity>.schema.json
+  schema/Tmf/<Domain>/DCS/<DCS>/Event/<Entity><Event>.schema.json
+
+Note that event payload schemas are only referred by their respective event schema.
+
+In the _JSON Schema files_ within the schema repository, references to another JSON Schema file is relative to the referring schema file. If necessary to navigate into adjacent or parent locations of the schema repository, the path part can start with the double-dot-segment "..". Any single-dot (".") segment is ignored.
+
+Examples:
+
+* References from an entity schema file to a target entity schema file of the same `<Domain>`:
+
+  <Entity>.schema.json
+
+* References from an entity schema file to a target schemes of a different `<Domain>` (can also be used for references in the same domain):
+
+  ../<Domain>/<Entity>.schema.json
+
+* References from an event schema file to its payload schema file (always located in the same directory):
+
+  <Entity><Event>Payload.schema.json
+
+* References from an event payload schema file to its entity schema file:
+
+  ../<Entity>.schema.json
+
+* and similar references from a DCS schema file to some other schema file.
++
+Note that DCS schemas are not referred from non-DCS schema files,
+and schema files of a specific <DCS> are not referred from the shared DCS schema files.
+
+Note that event payload schemas are only referred by their respective event schema.
+
+_The Fragment Part_
+
+By OAS 3.0, the fragment part should be interpreted as a https://datatracker.ietf.org/doc/html/rfc6901[JSON Pointer], beginning with a "/" and pointing through the JSON tree structure of the referred JSON Schema file. With the above defined structure of the schema files, the fragment part fits the pattern
+
+`/definitions/<Entity>`
 
 ==== *Generating an OAS file*
 
