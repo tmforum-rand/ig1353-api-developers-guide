@@ -10,7 +10,7 @@ Revision
 :url-repo: https://github.com/tmforum-rand/ig1353-api-developers-guide
 :doctype: book
 :toc: 
-
+ 
 == Executive Summary
 
 This “How To” document set provides onboarding instructions and a user-guide for the TMForum Open-API development tools. The document is organized in multiple parts as follows:
