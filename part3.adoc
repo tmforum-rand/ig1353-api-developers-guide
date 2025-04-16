@@ -2,7 +2,7 @@
 TM Forum Specification
 Revision
 :Revision: 1.0.0
-:Date: 18-Mar-2024
+:Date: 16-Apr-2025
 :IPR-Mode: RAND
 :TMF-Number: TODO
 :Status: DRAFT
@@ -158,25 +158,25 @@ Old API values are unlikely to throw tooling errors and will need to be caught b
 The remaining section of the rules file describes the resources of your API and the operations that you are allowing on them. The high-level structure looks like this:
 [source, yaml]
 ----
-resources:                                                                              <1>
- - name: <ResourceName>                                                                 <2>
-   schema: schemas/Tmf/<Domain>/<ResourceName>.schema.json#/definitions/<ResourceName>  <3>
+resources:                                                                        <1>
+ - name: <ResourceName>                                                           <2>
+   schema: schemas/Tmf/<Domain>/<Resource>.schema.json#/definitions/<Resource>    <3>
    examples:
-    - file: ./documentation/resource-samples/<ResourceName>.example.json                <4>
-   supportedHttpMethods:                                                                <5>
+    - file: ./documentation/resource-samples/<Resource>.example.json              <4>
+   supportedHttpMethods:                                                          <5>
      GET:
-       required: true                                                                   <6>
+       required: true                                                             <6>
      POST:
        required: true
-       requiredParameters:                                                              <7>
+       requiredParameters:                                                        <7>
         - description
-       parameterRestrictions:                                                           <8>
+       parameterRestrictions:                                                     <8>
         - id
         - href
         - status
-    notifications:                                                                      <9>
+    notifications:                                                                <9>
      - name: create
-       schema: schemas/Tmf/<Domain>/Event/<ResourceName>CreateEvent.schema.json#/definitions/<ResourceName>CreateEvent
+       schema: schemas/Tmf/<Domain>/Event/<Resource>CreateEvent.schema.json#/definitions/<Resource>CreateEvent
 ----
 <1> In the above rules file section, we are describing a single resource (or "endpoint") in our API called `ResourceName`. In reality your API might have a number of resources exposed, in which case everything from (2) onwards would be repeated for each one.
 <2> This is the name of our resource being exposed. It will appear in the OAS file under the `paths` property as `/ResourceName`.
@@ -227,52 +227,52 @@ A cut down TMForum JSON-Schema file for a fictitious `Document` entity looks lik
 [source, json]
 ----
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",                               <1>
-  "$id": "Document.schema.json",                                                      <2>
-  "title": "Document",                                                                <3>
+  "$schema": "http://json-schema.org/draft-07/schema#",                            <1>
+  "$id": "Document.schema.json",                                                   <2>
+  "title": "Document",                                                             <3>
   "definitions": {
-    "Document": {                                                                     <4>
-      "$id": "#Document",                                                             <5>
+    "Document": {                                                                  <4>
+      "$id": "#Document",                                                          <5>
       "type": "object",
-      "description": "Document is a tangible output from an activity",                <6>
-      "properties": {                                                                 <7>
-        "name": {                                                                     <8>
+      "description": "Document is a tangible output from an activity",             <6>
+      "properties": {                                                              <7>
+        "name": {                                                                  <8>
           "type": "string",
           "description": "A string used to give a name to the document"
         },
-        "size": {                                                                     <9>
+        "size": {                                                                  <9>
           "type": "integer",
           "description": "The size of the Document"
         },
-        "isEncrypted": {                                                             <10>
+        "isEncrypted": {                                                           <10>
           "type": "boolean",
           "description": "An example for a boolean attribute"
         },
-        "creationDate": {                                                            <11>
+        "creationDate": {                                                          <11>
           "type": "string",
           "format": "date-time",
-          "examples": [                                                              <12>
+          "examples": [                                                            <12>
             "2025-04-16T00:00:00Z"
           ],
           "description": "The date and time when the document was created"
         },
-        "validFor" : {                                                               <13>
-          "$ref": "../Common/TimePeriod.schema.json#/definitions/TimePeriod",        <14>
-          "description": "The period of time during which this Document is valid"    <15>
+        "validFor" : {                                                             <13>
+          "$ref": "../Common/TimePeriod.schema.json#/definitions/TimePeriod",      <14>
+          "description": "The period of time during which this Document is valid"  <15>
         },
-        "characteristic": {                                                          <16>
+        "characteristic": {                                                        <16>
           "type": "array",
           "items": {
             "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
           }
         }
       },
-      "allOf": [                                                                     <17>
+      "allOf": [                                                                   <17>
         {
           "$ref": "../Common/Entity.schema.json#/definitions/Entity"
         }
       ],
-      "required": [ "name" ]                                                         <18>
+      "required": [ "name" ]                                                       <18>
     }
   }
 }
@@ -365,7 +365,7 @@ An example of a TMForum JSON-Schema modelling a choice looks like this:
       "$id": "#DocumentRefOrValue",
       "type": "object",
       "description": "A Document provided by reference or by value",
-      "oneOf": [                                                                     <19>
+      "oneOf": [                                                                   <19>
         {
           "$ref": "../Common/Document.schema.json#/definitions/Document"
         },
@@ -515,3 +515,4 @@ This document was prepared by the members of the TM Forum API team:
 * Revathi Sivaji, TM Forum, Contributor
 * Heidi Lobecker, TM Forum, Contributor
 * Uche Uba, TM Forum, Contributor
+* Lutz Bettge, Deutsche Telekom, Contributor
