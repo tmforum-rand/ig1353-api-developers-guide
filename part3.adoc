@@ -519,3 +519,4 @@ This document was prepared by the members of the TM Forum API team:
 * Heidi Lobecker, TM Forum, Contributor
 * Uche Uba, TM Forum, Contributor
 * Lutz Bettge, Deutsche Telekom, Contributor
+* Olivier Arnaud, Orange, Contributor
