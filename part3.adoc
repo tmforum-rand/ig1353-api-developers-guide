@@ -1,8 +1,8 @@
 = TMForum API Developer's Handbook Part 3, The API Development Loop
 TM Forum Specification
 Revision
-:Revision: 1.0.0
-:Date: 18-Mar-2024
+:Revision: 0.2.0
+:Date: 17-Apr-2025
 :IPR-Mode: RAND
 :TMF-Number: TODO
 :Status: DRAFT
@@ -345,7 +345,7 @@ Nevertheless, the TMF tooling copies this description into the API Specification
 
 <16> This `characteristic` is a collection of _things of type Characteristic_, where the _Characteristic_ entity is itself defined in its own JSON-Schema file, being referenced (`$ref`) here. Collections are modelled as ordered `array` (thus having an array-index) of `items`.
 +
-Note that there must be #/definitions anchor to the ref location as in this example : "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
+Note that there must be \#/definitions anchor to the ref location as in this example : "$ref": "../Common/Characteristic.schema.json#/definitions/Characteristic"
 +
 Collections can further be restricted by `minItems`, `maxItems`, `uniqueItems`.
 
@@ -505,7 +505,8 @@ used for change control purposes only.
 |===
 |Version Number |Date Modified |Modified by | Description of changes
 
-|0.1 |18-Mar-2024 | Stephen Harrop |First layout of the basics
+|0.1.0 |18-Mar-2024 | Stephen Harrop |First layout of the basics
+|0.2.0 |17-Apr-2025 | Lutz Bettge |Schema Repository, details of Schema File, Reference Format 
 
 |===
 
