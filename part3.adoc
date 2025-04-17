@@ -215,7 +215,7 @@ Following the above pattern for schema files for resources, the schema file defi
 
 A schema file defining for an *<Entity>* an event *<Event>* is named `<Entity><Event>.schema.json`, and its payload is defined by a file `<Entity><Event>Payload.schema.json`. Both these kinds of files are placed in the "*Event*" subdirectory.
 
-Schema files for entities of a given *<DCS>* (Domain Context Specialization) are located in subdirectories named "*DCS*", with a further subdirectory for each DCS, and the analogue sub-structure as for non-DCS TMF classes.
+Schema files for entities of a given *<DCS>* (Domain Context Specialization) are located in subdirectories named "*DCS*", with a further subdirectory for each DCS, and the analogue sub-structure as for non-DCS TMF classes, including "*Event*" folders.
 
 The resulting directory structure is as follows:
 
