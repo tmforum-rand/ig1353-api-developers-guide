@@ -294,10 +294,28 @@ As people often start a new rules file with a copy-n-paste from a previous exist
 * API Description: Short/Concise: Avoid formatting and non-ASCII characters
 * Basepath/Server.URL: Do not use 'basePath' in the rules file - even though it is commonly copy-n-pasted from v4 rules files. It will not reflect in the OAS file.
 
-Schema files
+==== Schema files
 
 * Use of $ref: /definitions
 * Attribute descriptions: Be careful in Common/ to be 'generic'
+
+==== Submitting Your API for Review
+
+Please consider the following checklist before submitting your API for review:
+
+* [ ] No errors are shown on the Checklist tab in the Express UI after selecting your API
+* [ ] No errors are shown on the Examples tab in the Express UI after selecting your API and choosing to validate examples
+* [ ] No errors are shown in the output window of the Express UI when you generate the various assets (OAS file, user guide, conformance profile)
+* [ ] No errors are shown at the bottom of your pull request, as a result of running the automatic validations.
+* [ ] In your examples, ensure that `<entity>Ref` examples include the correct fields, including `@referredType` populated
+* [ ] In your examples for notifications, ensure that you abide by the rules:
+  ** [ ] Create event – the payload should show the entire entity
+  ** [ ] Attribute change event – the payload should show only the `@` properties, `id`, `href`, and the changed properties (in PATCH Merge format)
+  ** [ ] Status change event – the payload should show only the `@` properties, `id`, `href`, and the changed status/state value
+  ** [ ] Delete event – the payload should show only the `@` properties, `id`, `href`
+* [ ] In your examples for PATCH operation, ensure that you have all four example formats, with both request and response for each example
+* [ ] In your examples, ensure that the `id` and `href` are consistent with each other (basically the `id` should be identical to the last part of the `href`, after the rightmost `/` character)
+* [ ] If you use the example generation tool, ensure that you have replaced all the placeholder dummy strings and values with realistic values
 
 
 == Administrative Appendix
