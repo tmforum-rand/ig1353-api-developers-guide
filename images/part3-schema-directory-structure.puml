@@ -1,0 +1,32 @@
+@startsalt
+{
+{T
+ +<b>schemas</b>                                             | base directory for schema files
+ ++<b>Tmf</b>                                                | directory for TMF defined schemas 
+ +++<b>[Domain]</b>                                          | directory holding schemas of domain [Domain]
+ ++++<i>[Entity].schema.json</i>                             | schema file for entity [Entity]
+ ++++...
+ ++++<b>Event</b>                                            | subdirectory for event schemas
+ +++++<i>[Entity][Event].schema.json</i>                     | schema file for [Entity] related [Event] 
+ +++++<i>[Entity][Event]Payload.schema.json</i>              | schema file for the event's payload
+ +++++<i>...</i>
+ ++++<b>DCS</b>                                              | subdirectory for DCS schemas
+ +++++<i>[DCS Shared Entity].schema.json</i>                 | schema file for DCS shared entity [DCS Shared Entity]
+ +++++<i>...</i>
+ +++++<b>Event</b>                                           | subdirectory for DCS shared event schemas
+ ++++++<i>[DCS Shared Entity][Event].schema.json</i>         | schema file for [DCS Shared Entity] related [Event]
+ ++++++<i>[DCS Shared Entity][Event]Payload.schema.json</i>  | schema file for the event's payload
+ ++++++<i>...</i>
+ +++++<b>[DCS]</b>                                           | subdirectory for a specific [DCS]
+ ++++++<i>[DCS Entity].schema.json</i>                       | schema file for a [DCS Entity] specific for this [DCS]
+ ++++++<i>...</i>
+ ++++++<b>Event</b>                                          | subdirectory for event schemas of this [DCS]
+ +++++++<i>[DCS Entity][Event].schema.json</i>               | schema file for [DCS Entity] related [Event]
+ +++++++<i>[DCS Entity][Event]Payload.schema.json</i>        | schema file for the event's payload
+ +++++++<b>...</b>
+ ++++++<b>...</b>
+ ++++<b>...</b>
+ +++<b>...</b>
+}
+}
+@endsalt
