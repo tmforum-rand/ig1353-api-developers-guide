@@ -2,7 +2,7 @@
 TM Forum Specification
 Revision
 :Revision: 0.2.0
-:Date: 17-Apr-2025
+:Date: 17-Apr-2024
 :IPR-Mode: RAND
 :TMF-Number: TODO
 :Status: DRAFT
@@ -28,45 +28,128 @@ This “How To” document set provides onboarding instructions and a user-guide
 
 This part (Part Three) of the document provides an overview of the API development process, the inputs expected by the API author and the use of the tools to generate the necessary documents.
 
+== Glossary and Abbreviations
+
+Before diving into the technical details, here are key abbreviations and terms used throughout this document:
+
+[options=header,stripes=even]
+|===
+|Abbreviation |Full Form |Description
+
+|API |Application Programming Interface |A set of protocols and tools for building software applications
+|AsciiDoc |AsciiDoc |A lightweight markup language for writing technical documentation  
+|CI/CD |Continuous Integration/Continuous Deployment |Automated practices for integrating code changes and deploying applications
+|CTK |Conformance Test Kit |TMForum's testing framework to validate API implementations
+|DCS |Domain Context Specialization |TMForum's approach to creating specialized versions of APIs for specific domains
+|EPIC |EPIC |Large work items in JIRA that group related user stories or tasks
+|IDE |Integrated Development Environment |Software application providing comprehensive facilities for software development
+|JIRA |JIRA |Project management and issue tracking tool from Atlassian
+|JSON |JavaScript Object Notation |Lightweight data interchange format
+|JQL |JIRA Query Language |Query language used to search for issues in JIRA
+|OAS |OpenAPI Specification |A specification for describing REST APIs (formerly known as Swagger)
+|PlantUML |PlantUML |Tool for creating UML diagrams from text descriptions
+|REST |Representational State Transfer |Architectural style for designing networked applications
+|RI |Reference Implementation |Sample code demonstrating how to implement an API
+|SID |Shared Information/Data Model |TMForum's standard information model
+|TMF |TM Forum |Global industry association for communications service providers
+|UML |Unified Modeling Language |Standardized modeling language for software design
+|YAML |YAML Ain't Markup Language |Human-readable data serialization standard
+|===
+
 :sectnums:
 == Managing Our Work
 
-The TMForum uses a number of online collaboration tools to manage member's work across multiple companies and timezones. This includes weekly meetings, evolution of the API design patterns, API development progress and technical backlogs.
+TMForum coordinates API development across multiple companies and timezones using several online collaboration tools. Understanding how work is organized and tracked is essential for effective participation in the API development process.
 
 === Tracking API Asset Production
 
-* Use of JIRA, dashboards, EPICs
+TMForum uses JIRA (a project management tool) to track the overall progress of API development. Key concepts include:
+
+* **JIRA Dashboards**: Visual displays showing project status, progress metrics, and key issues
+* **EPICs**: Large work items that group related tasks together. Each major API development effort typically has its own EPIC
+* **Issues**: Individual work items, bug reports, or feature requests within an EPIC
+
+The JIRA system provides visibility into what APIs are being developed, their current status, and any blockers or dependencies.
 
 === Technical JIRAs: The API Backlog
 
-* Use of the "Component" attribute
-* Reviewed weekly: Only to get consensus on a direction
-* Making a report with JQL
-* Attaching the technical backlog to the API EPIC?
+The technical backlog in JIRA captures detailed requirements, bugs, and enhancement requests for APIs. Key practices include:
+
+* **Component Attribute Usage**: Each JIRA issue is tagged with a "Component" to identify which API or technical area it relates to
+* **Weekly Reviews**: Technical issues are reviewed weekly, but only to achieve consensus on direction rather than detailed technical solutions
+* **JQL Reporting**: JIRA Query Language (JQL) is used to create custom reports and filters for tracking specific types of issues
+* **EPIC Attachment**: Technical backlog items are linked to their corresponding API EPIC for traceability
+
+Understanding this structure helps newcomers find relevant issues and understand the current priorities.
 
 === Git Issues: The Tooling and CI/CD Backlog
 
-* Tooling is more code-centric, so more amenable to direct Git references and Git issues
-* Reviewed weekly
+While business and API requirements are managed in JIRA, technical tooling issues are tracked directly in GitHub:
+
+* **Code-Centric Approach**: Since tooling involves code changes, GitHub Issues provide better integration with pull requests and code reviews
+* **Direct Git References**: Issues can be directly linked to specific commits, branches, or pull requests
+* **Weekly Reviews**: Tooling issues are also reviewed weekly to ensure development tools continue to meet the team's needs
+
+This separation allows for more efficient tracking of different types of work while maintaining appropriate visibility.
 
 == The Production Process
 
-Maybe this is just a sumamry table or a flow diagram:
+The TMForum API development process follows a structured approach to transform business requirements into fully documented and tested API specifications. The process involves several automated generation steps:
 
-* OAS Specification Generation
-* PlantUML Diagram Generation
-* Conformance Profile Generation
-* CTK Generation
-* RI/Sample Code Generation
-* The Publication Process
+=== API Generation Pipeline
+
+The production process consists of several interconnected stages:
+
+1. **OAS Specification Generation**: The OpenAPI Specification (OAS) file is automatically generated from the API rules file and JSON schema definitions
+2. **PlantUML Diagram Generation**: UML class diagrams are automatically created to visualize the API's data model and relationships
+3. **Conformance Profile Generation**: Test specifications are generated to define what constitutes a compliant implementation
+4. **CTK Generation**: The Conformance Test Kit (CTK) is built to provide executable tests for API implementations
+5. **RI/Sample Code Generation**: Reference Implementation (RI) code samples are produced to demonstrate proper API usage
+6. **The Publication Process**: Final artifacts are packaged and published to the TMForum catalog
+
+=== Understanding the Dependencies
+
+Each step depends on the previous ones, creating a pipeline where:
+
+* Changes to the rules file trigger OAS regeneration
+* Schema modifications affect both OAS and diagram generation
+* All artifacts must be regenerated when core definitions change
+
+This automated approach ensures consistency across all deliverables while reducing manual effort and potential errors.
+
+NOTE: The generation tools are designed to be run frequently during development to catch issues early and provide immediate feedback on changes.
 
 == How To
 
 === Creating a CodeSpace
 
-Codespace (https://docs.github.com/en/codespaces/overview) is a development environment that is spun-up on request and hosted on your behalf in the Azure cloud by GitHub. This mitigates the technical problems caused by members having different in-house development environments, configurations, language/tool versions, and restrictive corporate firewalls. 
+**What is a CodeSpace?**
 
-The TMForum pay for this hosting, and boundaries are set on how much RAM and CPU resource is allocated and how long the instance will remain when unattended. The codespace is created from an Ubuntu Linux image that includes popular languages and tools by default.
+CodeSpace (https://docs.github.com/en/codespaces/overview) is a cloud-based development environment that GitHub provides to run your code and tools in the cloud. For TMForum API development, this solves several common challenges:
+
+* **Environment Consistency**: All developers work in identical environments, eliminating "it works on my machine" issues
+* **Corporate Firewall Issues**: Codespaces run in the cloud, bypassing restrictive corporate network policies
+* **Tool Version Conflicts**: The environment includes pre-configured tools and language versions
+* **Quick Setup**: No need to install and configure development tools locally
+
+**TMForum-Specific Benefits:**
+
+The TMForum maintains customized Codespace configurations that include:
+
+* Pre-installed API generation tools
+* Correct versions of Node.js, Python, and other dependencies
+* TMForum-specific scripts and utilities
+* Access to private repositories (once authorized)
+
+**Cost and Resource Limits:**
+
+TMForum covers the hosting costs for authorized developers, with limits on:
+
+* RAM and CPU allocation per instance
+* Maximum idle time before automatic shutdown
+* Number of concurrent instances per developer
+
+**Important Data Persistence Warning:**
 
 image::images/part3-codespace.png[Codespaces,1440,1030,align="center",link=https://docs.github.com/en/codespaces/overview,window=_blank]
 
@@ -144,7 +227,7 @@ api:
 ----
 <1> This is the *version of the rules file format itself* - not of the API under construction. It is used by the OAS generator to warn of any outdated syntax, and will change very infrequently
 <2> This is the name of your API. It will appear in the OAS file in the `info.title` attribute.
-<3> [TODO] shortName
+<3> This is the short name of your API, used in contexts where a brief identifier is needed. It should be a concise version of the full API name, typically without spaces or special characters.
 <4> This is the description of your API. It will appear in the OAS file in the `info.description` attribute. Try to keep this description fairly concise, avoid using formatting tags (as the text may appear in many formats: HTML, PDF and OAS rendering). Avoid use of special non-ASCII characters (such as copyright, trademark symbols) as these can also trip-up later parsing.
 <5> This is the identity allocated by the TMForum to this API - typically in the form "TMFxxx" - where "xxx" is a three digit number. It has no direct translation into the OAS file, but will be used by the tooling in generation.
 <6> The `hostUrl` translates into the `servers.url` attribute of the OAS file. Note that previous TMF-v4 swagger rules files used a `basePath` attribute which is ignored in OAS file generation.
@@ -446,44 +529,254 @@ By OAS 3.0, the fragment part should be interpreted as a https://datatracker.iet
 
 ==== *Generating an OAS file*
 
-* Using the Web UI from when the Cloudspace first spun-up, or if you don't have this available any more, see the end of section 3.1 [TODO: X-Ref]. This tab will present you with a simple Web UI with a drop-down list of APIs, one for every directory under `OAS_Open_API_And_Data_Model/apis`. Use this to find your API in the drop down list:
+Once you have created your rules file and schema definitions, you can generate the OpenAPI Specification (OAS) file using the TMForum tooling.
+
+**Using the Web UI:**
+
+1. Access the Express WebUI from your Codespace (if you closed the tab, see the Codespace setup instructions earlier in this document)
+2. The interface presents a drop-down list of APIs, showing every directory under `OAS_Open_API_And_Data_Model/apis`
+3. Select your API from the dropdown list
+4. Click the "Generate OAS" button to create the specification
+5. Review the generated file and any validation messages
+
+**Using Command Line Tools:**
+
+If you prefer command-line tools or the WebUI is unavailable:
+
+```bash
+# Navigate to your API directory
+cd /path/to/your/api
+
+# Generate the OAS specification
+npm run generate
+
+# View the generated OAS file
+cat generated/openapi.yaml
+```
+
+**Validation and Review:**
+
+After generation, always review:
+
+* The generated OAS file structure
+* Any error or warning messages
+* Compliance with TMForum API Design Guidelines
+* Consistency with your intended API design
+
+The generation process will fail if there are syntax errors in your rules file or missing schema references, providing immediate feedback on issues that need to be resolved.
 
 
 === User Guide Deep Dive
 
-* Structure and Template
-* Cover Page: Title, Version, Date, Status
-* Examples
-* Auxillary Diagrams (Lifecycles)
+The User Guide is automatically generated from your API rules file and provides comprehensive documentation for API consumers. Understanding its structure helps ensure your API documentation meets professional standards.
+
+==== Structure and Template
+
+The generated User Guide follows a consistent template:
+
+* **Cover Page**: Contains the API title, version, date, and status information from your rules file
+* **Table of Contents**: Automatically generated from your API structure
+* **API Overview**: Derived from your API description and scope
+* **Resource Definitions**: Detailed descriptions of each API endpoint
+* **Data Models**: Complete schema documentation with examples
+* **Operation Examples**: Request/response examples for each supported operation
+
+==== Examples Integration
+
+Examples play a crucial role in making APIs accessible:
+
+* Resource examples demonstrate typical data structures
+* Operation examples show request/response patterns
+* Error examples illustrate proper error handling
+* All examples are validated against the generated OAS specification
+
+==== Auxiliary Diagrams (Lifecycles)
+
+State transition diagrams and lifecycle illustrations help users understand:
+
+* Entity state changes over time
+* Valid operation sequences
+* Business process flows
+* Error and exception paths
+
+These diagrams are typically hand-crafted using PlantUML and integrated into the generated documentation.
 
 === Conformance Profile Deep Dive
 
-* Initial Generation
-* How to read the file
-* How to craft a custom rule
+The Conformance Profile defines exactly what an API implementation must support to be considered compliant with the TMForum specification.
+
+==== Initial Generation
+
+The profile is automatically generated from your rules file, particularly:
+
+* Required operations (marked with `required: true`)
+* Mandatory parameters (listed under `requiredParameters`)
+* Parameter restrictions (specified in `parameterRestrictions`)
+* Required notification events
+
+==== How to Read the Profile
+
+The conformance profile uses a structured format:
+
+* **MUST requirements**: Non-negotiable implementation requirements
+* **SHOULD requirements**: Strongly recommended but not mandatory
+* **MAY requirements**: Optional features that enhance functionality
+* **Test scenarios**: Specific test cases that validate compliance
+
+==== How to Craft a Custom Rule
+
+When standard patterns don't fit your API requirements:
+
+1. **Identify the gap**: Determine what standard conformance rules don't address
+2. **Document the requirement**: Clearly specify what behavior is expected
+3. **Define test criteria**: Establish how compliance will be measured
+4. **Add custom validation**: Implement additional checks in your rules file
+5. **Update documentation**: Ensure the User Guide reflects the custom requirements
+
+Custom rules should align with TMForum API Design Guidelines while addressing specific domain needs.
 
 === Troubleshooting
 
-* Codespace "Express" WebUI
-** Stops working
-** Generation problems: Looking at the underlying "log.log" file?
-** How to run the OAS and user-guide generation without the Express UI?
-* Examples are not currently validated against the OAS file
+API development can encounter various technical issues. This section provides guidance on common problems and their solutions.
+
+==== Codespace "Express" WebUI Issues
+
+The Express WebUI provides a user-friendly interface for API generation, but several issues can occur:
+
+**When the WebUI Stops Working:**
+
+* **Symptom**: The web interface becomes unresponsive or shows errors
+* **Solution**: Restart the service by closing and reopening the browser tab, or restart the Codespace entirely
+* **Prevention**: Avoid leaving the WebUI idle for extended periods
+
+**Generation Problems:**
+
+* **Symptom**: API generation fails or produces unexpected results
+* **Diagnosis**: Check the underlying log files for detailed error messages
+* **Location**: Look for `log.log` files in your API directory
+* **Analysis**: Error messages often point to specific lines in your rules file or schema files
+
+**Running Generation Without the Express UI:**
+
+If the WebUI is not available, you can generate APIs using command-line tools:
+
+```bash
+# Navigate to your API directory
+cd /path/to/your/api
+
+# Generate OAS specification
+npm run generate
+
+# Generate user guide
+npm run generate-docs
+
+# Generate conformance profile
+npm run generate-conformance
+```
+
+==== Common Validation Issues
+
+**Examples Not Validating Against OAS:**
+
+* **Common Issue**: Example payload files are validated against the generated OAS specification. This produces a common source of initial errors as you iterate on the payload to make sure the payload matches the expected syntax of the OAS file.
+* **Solution**: Carefully review validation errors and adjust your examples to match the schema requirements
+* **Best Practice**: Keep examples simple and closely aligned with your schema definitions
+
+**Schema Reference Errors:**
+
+* **Symptom**: Generation fails with "schema not found" errors
+* **Cause**: Incorrect file paths or missing schema files
+* **Solution**: Verify all `$ref` paths are correct and target files exist
+
+**Rules File Syntax Issues:**
+
+* **Symptom**: YAML parsing errors during generation
+* **Cause**: Incorrect indentation or invalid YAML syntax
+* **Solution**: Use a YAML validator or IDE with YAML support to check syntax
+
+==== Getting Help
+
+When troubleshooting becomes difficult:
+
+1. **Check the logs**: Always start with the detailed log files
+2. **Review recent changes**: Compare your current rules file with the last working version
+3. **Test incrementally**: Comment out sections to isolate the problem
+4. **Consult the community**: Use GitHub Issues for tooling problems or JIRA for API-specific questions
 
 === Governance Checklists
 
-A table of quick visual tests on the details of the rules file and user guide
-As people often start a new rules file with a copy-n-paste from a previous existing file - it is easy for "working errors" to permiate unnoticed.
+Quality assurance is critical for TMForum APIs. These checklists provide quick visual tests to catch common issues before they propagate through the generation process.
 
-* API Name: ("Management" convention?)
-* API Version: Following SemVer.org
-* API Description: Short/Concise: Avoid formatting and non-ASCII characters
-* Basepath/Server.URL: Do not use 'basePath' in the rules file - even though it is commonly copy-n-pasted from v4 rules files. It will not reflect in the OAS file.
+==== Rules File Quality Checklist
 
-==== Schema files
+As people often start a new rules file with a copy-and-paste from a previous existing file - it is easy for "working errors" to permeate unnoticed. Review these items carefully:
 
-* Use of $ref: /definitions
-* Attribute descriptions: Be careful in Common/ to be 'generic'
+**API Metadata:**
+* [ ] **API Name**: Follows TMForum naming conventions (typically ends with "Management" for resource management APIs)
+* [ ] **API Version**: Strictly follows SemVer.org format (major.minor.patch, e.g., "5.0.0")
+* [ ] **API Description**: Concise and clear, avoiding formatting characters and non-ASCII symbols
+* [ ] **TMF ID**: Correct three-digit TMForum identifier (e.g., "TMF620")
+* [ ] **Host URL**: Uses correct server URL format, not legacy `basePath` attribute
+
+**Common Copy-Paste Errors:**
+* [ ] API name updated from source template
+* [ ] TMF ID changed from source template
+* [ ] Resource names reflect your API, not the source API
+* [ ] Schema references point to your domain directory
+* [ ] Example file paths updated to your API structure
+
+**Technical Validation:**
+* [ ] No errors in Express UI checklist tab
+* [ ] No errors in Express UI examples validation
+* [ ] No errors in generation output window
+* [ ] No errors in pull request validation checks
+
+==== Schema Files Quality Checklist
+
+Schema files define the structure of your API data. Common issues include:
+
+**Reference Format:**
+* [ ] All `$ref` paths use correct format: `../Domain/EntityName.schema.json#/definitions/EntityName`
+* [ ] Schema file names match entity names exactly
+* [ ] Directory structure follows TMForum conventions
+
+**Description Quality:**
+* [ ] Attribute descriptions are generic enough for reuse across APIs
+* [ ] Common schema descriptions avoid API-specific references
+* [ ] All required fields have clear descriptions
+
+**Schema Validation:**
+* [ ] JSON schema syntax is valid
+* [ ] All referenced schemas exist
+* [ ] Required fields are appropriate for the entity
+* [ ] Data types are correctly specified
+
+==== Examples Quality Checklist
+
+Examples are crucial for API usability. Verify:
+
+**Reference Examples:**
+* [ ] All `<Entity>Ref` examples include required fields
+* [ ] `@referredType` field is properly populated
+* [ ] `id` and `href` values are consistent with each other
+
+**Notification Examples:**
+* [ ] **Create events**: Payload shows the complete entity
+* [ ] **Attribute change events**: Payload shows only `@` properties, `id`, `href`, and changed properties
+* [ ] **Status change events**: Payload shows only `@` properties, `id`, `href`, and status/state changes
+* [ ] **Delete events**: Payload shows only `@` properties, `id`, and `href`
+
+**PATCH Operation Examples:**
+* [ ] All four PATCH formats included (JSON Merge Patch, JSON Patch, etc.)
+* [ ] Both request and response examples provided for each format
+* [ ] Examples demonstrate realistic use cases
+
+**Data Consistency:**
+* [ ] `id` values match the last segment of corresponding `href` values
+* [ ] Placeholder values replaced with realistic data
+* [ ] Examples validate against the generated OAS specification
+
+Use these checklists during development and before submitting APIs for review to ensure high quality and consistency.
 
 ==== Submitting Your API for Review
 
