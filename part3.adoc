@@ -665,7 +665,7 @@ If the WebUI is not available, you can generate APIs using command-line tools:
 cd /path/to/your/api
 
 # Generate OAS specification
-npm run generate-oas
+npm run generate
 
 # Generate user guide
 npm run generate-docs
@@ -678,8 +678,8 @@ npm run generate-conformance
 
 **Examples Not Validating Against OAS:**
 
-* **Current Limitation**: Example files are not automatically validated against the generated OAS specification
-* **Workaround**: Manually validate examples using tools like Swagger Editor
+* **Common Issue**: Example payload files are validated against the generated OAS specification. This produces a common source of initial errors as you iterate on the payload to make sure the payload matches the expected syntax of the OAS file.
+* **Solution**: Carefully review validation errors and adjust your examples to match the schema requirements
 * **Best Practice**: Keep examples simple and closely aligned with your schema definitions
 
 **Schema Reference Errors:**
@@ -817,7 +817,7 @@ used for change control purposes only.
 |Version Number |Date Modified |Modified by | Description of changes
 
 |0.1.0 |18-Mar-2024 | Stephen Harrop |First layout of the basics
-|0.2.0 |17-Apr-2024 | Lutz Bettge |Schema Repository, details of Schema File, Reference Format 
+|0.2.0 |17-Apr-2025 | Lutz Bettge |Schema Repository, details of Schema File, Reference Format 
 
 |===
 
