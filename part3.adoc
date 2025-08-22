@@ -198,21 +198,97 @@ The TMF API rules file, along with JSON schema files - form the main areas of in
 
 The rules file is a YAML file (https://en.wikipedia.org/wiki/YAML), written in a Domain-Specific Language invented within the TMForum. Its purpose is to describe the high-level structure of the generated OAS file, and it is the main input to the TMF OAS generator.
 
-The high-level structure of a simple rules file is shown below. This describes:
+== API Rules File: Basic API Properties
 
-- An API called `MyAPI` (highlighted)
-- With a single resource called `MyResource`  (highlighted)
-- This resource has four required operations: `GET`, `PATCH`, `POST` and `DELETE`
-- The `PATCH` operation does not allow `id`, `href`, `@type`, `@baseType` or `@schemaLocation` to be modified
-- The `POST` operation mandates the `name` attribute
-- The API can emit 3 notification types: `create`, `change` and `delete`
+This section describes the metadata required at the beginning of a rules file.
+It defines the essential properties that identify and describe the API, as well as how these values map into the generated OpenAPI Specification (OAS) file.
 
-[plantuml,json,svg,align="center"]
+=== Properties
+
+[cols="1,1,1,3"]
+|===
+|Property |Type |Required |Description
+
+|`name`
+|string
+|Yes
+|Full API name for documentation.
+Appears in the OAS file in the `info.title` attribute.
+
+|`description`
+|string
+|No
+|API description text.
+Appears in the OAS file in the `info.description` attribute.
+Supports CommonMark Markdown. Keep concise and avoid special non-ASCII characters or formatting tags.
+
+|`tmfId`
+|string
+|No
+|TM Forum identifier allocated to this API.
+Format: `TMFxxx` (three or more digits).
+Used by tooling but does not map directly to OAS.
+
+|`shortName`
+|string
+|Yes
+|Short API identifier for constructing names.
+Must match the pattern: `^[a-zA-Z0-9]{3,}`.
+Used in contexts requiring concise identifiers (e.g., code generation, references).
+
+|`hostUrl`
+|string
+|No
+|Base host URL of the API.
+Translates into the `servers.url` attribute in the OAS file.
+Note: in older TMF-v4 rules files, `basePath` was used instead, but this is ignored in OAS generation.
+
+|`basePath`
+|string
+|No
+|API base path appended to `hostUrl`.
+**Note:** This is retained for compatibility but ignored in OAS generation.
+
+|`version`
+|string
+|No
+|API version number following [SemVer](https://semver.org/) format: `<major>.<minor>.<patch>`.
+Appears in the OAS file as `info.version`.
+
+|`resources`
+|array
+|Yes
+|List of resource definitions belonging to the API.
+|===
+
+=== Example Rules File
+
+A minimal rules file with annotated metadata:
+
+[source,yaml]
 ----
-include::images/rules-structure.puml[]
+rulesVersion: 1.0.0                                         # <1>
+api:
+  name:        MyAPI                                        # <2>
+  shortName:   MyAPI                                        # <3>
+  description: MyAPI description                            # <4>
+  tmfId:       TMF123                                       # <5>
+  hostUrl:     'https://serverRoot/tmf-api/MyAPI/v5/'       # <6>
+  version:     5.0.0                                        # <7>
+  resources:
+    # Resource definitions go here
 ----
+<1> Version of the rules file format itself, not the API. Rarely changes.
+<2> Full name of the API, appears in `info.title`.
+<3> Short identifier for the API, without spaces or special characters.
+<4> Concise description, appears in `info.description`.
+<5> TMF identifier, e.g., `TMF678`. Used by tooling only.
+<6> Base host URL, becomes `servers.url` in OAS.
+<7> API version, SemVer formatted, becomes `info.version`.
+
 
 ==== *API Meta Data*
+
 The beginning  of the API rules file - describing the API metadata looks like this:
 [source, yaml]
 ----
@@ -225,13 +301,13 @@ api:
   hostUrl:     'https://serverRoot/tmf-api/MyAPI/v5/'       <6>
   version:     5.0.0                                        <7>
 ----
-<1> This is the *version of the rules file format itself* - not of the API under construction. It is used by the OAS generator to warn of any outdated syntax, and will change very infrequently
-<2> This is the name of your API. It will appear in the OAS file in the `info.title` attribute.
-<3> This is the short name of your API, used in contexts where a brief identifier is needed. It should be a concise version of the full API name, typically without spaces or special characters.
-<4> This is the description of your API. It will appear in the OAS file in the `info.description` attribute. Try to keep this description fairly concise, avoid using formatting tags (as the text may appear in many formats: HTML, PDF and OAS rendering). Avoid use of special non-ASCII characters (such as copyright, trademark symbols) as these can also trip-up later parsing.
-<5> This is the identity allocated by the TMForum to this API - typically in the form "TMFxxx" - where "xxx" is a three digit number. It has no direct translation into the OAS file, but will be used by the tooling in generation.
+<1> The *version of the rules file format itself* - not of the API under construction. It is used by the OAS generator to warn of any outdated syntax, and will change very infrequently.
+<2> The name of your API. It appears in the OAS file in the `info.title` attribute.
+<3> A short name for your API, used in contexts where a brief identifier is needed. It should be a concise version of the full API name, typically without spaces or special characters.
+<4> A description of your API. It appears in the OAS file in the `info.description` attribute, which supports CommonMark Markdown. Try to keep this description fairly concise, avoid using formatting tags (as the text may appear in many formats: HTML, PDF and OAS rendering). Avoid use of special non-ASCII characters (such as copyright, trademark symbols) as these can also trip-up later parsing.
+<5> The identity allocated by TM Forum to this API - typically in the form "TMFxxx" - where "xxx" is a three digit number. It has no direct translation into the OAS file, but will be used by the tooling in generation.
 <6> The `hostUrl` translates into the `servers.url` attribute of the OAS file. Note that previous TMF-v4 swagger rules files used a `basePath` attribute which is ignored in OAS file generation.
-<7> This is the version of your TMForum API. It follows the SemVer (https://semver.org/) versioning format: *<major>.<minor>.<patch>*. This value appears in the OAS file as attribute: `info.version`.
+<7> This is the version of your TM Forum API. It follows the SemVer (https://semver.org/) versioning format: *<major>.<minor>.<patch>*. This value appears in the OAS file as attribute: `info.version`.
 
 WARNING: New API development is typically started by copying and pasting an existing, working rules file from another API directory. While this is fine, and encouraged - do take the time to go through the above line-by-line to ensure that you have updated the values to reflect your new API.
 Old API values are unlikely to throw tooling errors and will need to be caught by human review. If you take this review time up-front, it will prevent problems permeating the OAS file, User Guide and other published artifacts.
