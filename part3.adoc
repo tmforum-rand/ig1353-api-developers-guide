@@ -656,24 +656,6 @@ The Express WebUI provides a user-friendly interface for API generation, but sev
 * **Location**: Look for `log.log` files in your API directory
 * **Analysis**: Error messages often point to specific lines in your rules file or schema files
 
-**Running Generation Without the Express UI:**
-
-If the WebUI is not available, you can generate APIs using command-line tools:
-
-```bash
-# Navigate to your API directory
-cd /path/to/your/api
-
-# Generate OAS specification
-npm run generate
-
-# Generate user guide
-npm run generate-docs
-
-# Generate conformance profile
-npm run generate-conformance
-```
-
 ==== Common Validation Issues
 
 **Examples Not Validating Against OAS:**
