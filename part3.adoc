@@ -354,48 +354,31 @@ resources:
   - name: CustomerBill
     schema: "schemas/Tmf/Customer/CustomerBill.schema.json#/definitions/CustomerBill"
     supportedHttpMethods:
-      # HTTP method configurations
+     GET:
+       required: true                                                             <1>
+     POST:
+       required: true
+       requiredParameters:                                                        <2>
+        - description
+       parameterRestrictions:                                                     <3>
+        - id
+        - href
+        - status
     notifications:
       # Event definitions
     examples:
       # Resource examples
 ----
+<1> For each operation, you can state whether this is required in every implementation of this API. For example, you might decide that a Trouble Ticket API does not make sense without the ability to at least *GET* one or more Trouble Tickets from a ticketing server implementation. In which case, you would state `required: true`. This has no direct translation to the generated OAS file, but the  operation will be mentioned as required in the user guide, and it will cause the TMForum Conformance Test Kit (CTK) to insist that this operation exists and is tested - in order to gain TMForum _conformance_ to this API.
+<2> For some operations (POST, PATCH), it can make sense to insist that certain properties are present in the submitted payload from the client. You might decide that an entity MUST at least have a _name_, _description_, _value_ or some combination - for it to make sense. In which case, you would list these properties under `requiredParameters`.
+<3> Conversely, you can also insist that certain properties from your canonical resource are *not* submitted by the client with POST-ing a payload. For example it is typically for the producer to decide on properties like *status* or *creationDate*. You would list these under `parameterRestrictions`.
 
 Add an array entry to the resources collection for each resource that is included in your API. The name field dictates the path, in this example `/CustomerBill`.
 
-=== *API Operations and Notifications*
+=== *Notifications*
 
-Describe the operations and notifications for each resource.
+Describe the operations and notifications for each resource. The following operations may suggest these event notifications:
 
-[source, yaml]
-----
-resources:                                                                        
- - name: <ResourceName>                                                           
-   schema: schemas/Tmf/<Domain>/<Resource>.schema.json#/definitions/<Resource>    
-   examples:
-    - file: ./documentation/resource-samples/<Resource>.example.json              
-   supportedHttpMethods:                                                          <1>
-     GET:
-       required: true                                                             <2>
-     POST:
-       required: true
-       requiredParameters:                                                        <3>
-        - description
-       parameterRestrictions:                                                     <4>
-        - id
-        - href
-        - status
-    notifications:                                                                <5>
-     - name: create
-       schema: schemas/Tmf/<Domain>/Event/ResourceNameCreateEvent.schema.json#/definitions/ResourceNameCreateEvent
-----
-<1> The `supportedHttpMethods` node provides some combination of the operations that you are allowing on your resource: *GET*, *POST*, *PATCH* and *DELETE*.
-<2> For each operation, you can state whether this is required in every implementation of this API. For example, you might decide that a Trouble Ticket API does not make sense without the ability to at least *GET* one or more Trouble Tickets from a ticketing server implementation. In which case, you would state `required: true`. This has no direct translation to the generated OAS file, but the  operation will be mentioned as required in the user guide, and it will cause the TMForum Conformance Test Kit (CTK) to insist that this operation exists and is tested - in order to gain TMForum _conformance_ to this API.
-<3> For some operations (POST, PATCH), it can make sense to insist that certain properties are present in the submitted payload from the client. You might decide that an entity MUST at least have a _name_, _description_, _value_ or some combination - for it to make sense. In which case, you would list these properties under `requiredParameters`.
-<4> Conversely, you can also insist that certain properties from your canonical resource are *not* submitted by the client with POST-ing a payload. For example it is typically for the producer to decide on properties like *status* or *creationDate*. You would list these under `parameterRestrictions`.
-<5> Finally, the API implementation might choose to publish events when significant state transitions occur in its implementation. For example, Orders will typically move through a number of states (such as _acknowledged_, _inProgress_, _failed_, _done_) while processing, and other clients might chose to subscribe an interest in these state changes.
-
-The following operations may suggest these event notifications:
 [options=header]
 |===
 |Operation |Typical Event Notifications
