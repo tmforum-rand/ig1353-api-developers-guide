@@ -1,0 +1,174 @@
+/* TM Forum HTML theme for AsciiDoc */
+
+/* Import DMSans font from Google Fonts as fallback */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* Base styles */
+body {
+    font-family: 'DM Sans', Calibri, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header with logo */
+#header {
+    border-bottom: 2px solid #D91241;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+#header h1 {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+#header h1::before {
+    content: '';
+    display: inline-block;
+    background-image: url('images/tmforum-logo.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 50px;
+    width: 150px;
+    flex-shrink: 0;
+}
+
+/* Headings with TM Forum red */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'DM Sans', Calibri, sans-serif;
+    font-weight: bold;
+    line-height: 1.3;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+h2 {
+    color: #D91241;
+    font-size: 20pt;
+    border-bottom: 1px solid #D91241;
+    padding-bottom: 0.3em;
+}
+
+h3 {
+    font-size: 14pt;
+    color: #333;
+}
+
+h4 {
+    color: #D91241;
+    font-size: 12pt;
+}
+
+h5 {
+    font-size: 11pt;
+    color: #333;
+}
+
+h6 {
+    color: #D91241;
+    font-size: 11pt;
+}
+
+/* Links */
+a {
+    color: #D91241;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Code blocks */
+pre, code {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+pre {
+    padding: 1em;
+    overflow-x: auto;
+}
+
+code {
+    padding: 0.2em 0.4em;
+}
+
+pre code {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+/* Tables */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+
+table thead {
+    background-color: #D91241;
+    color: white;
+}
+
+table th, table td {
+    border: 1px solid #000;
+    padding: 0.5em;
+    text-align: left;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Images */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Footer */
+#footer {
+    border-top: 1px solid #ccc;
+    padding-top: 1rem;
+    margin-top: 3rem;
+    font-size: 0.9em;
+    color: #666;
+}
+
+#footer-text::before {
+    content: '© 2025 TM Forum. All rights reserved.';
+    display: block;
+    margin-bottom: 0.5em;
+}
+
+/* Admonition blocks (NOTE, TIP, WARNING, etc.) */
+.admonitionblock td.icon {
+    text-align: center;
+    width: 80px;
+    color: #D91241;
+}
+
+.admonitionblock td.content {
+    padding-left: 1em;
+    border-left: 3px solid #D91241;
+}
+
+/* Lists */
+ul, ol {
+    margin: 1em 0;
+    padding-left: 2em;
+}
+
+li {
+    margin: 0.5em 0;
+}
