@@ -22,7 +22,7 @@ This “How To” document set provides onboarding instructions and a user-guide
 |*Part One: Initial Onboarding* |Prerequisites/Good To Know, First-Time Onboarding
 |*Part Two: Starting a New API* |API Inception, API Profile, Getting an API Number
 |*Part Three: The API Development Loop* |Admin: JIRA issues, Git issues and Branching, API Tools, How To Deep-Dives
-|*Part Four: Advanced API Development* |ASyncAPI Specifications, How to make a DCS API, How to make a Composite API
+|*Part Four: Advanced API Development* |API Specialization, Async APIs
 |===
 
 
