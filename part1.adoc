@@ -110,8 +110,6 @@ https://projects.tmforum.org/jira/servicedesk/customer/portal/3/create/102
 
 image::images/part1-github-request-form.png[Registration,414,508,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
 
-|===
-
 == Administrative Appendix
 
 This Appendix provides additional background material about the TM Forum
