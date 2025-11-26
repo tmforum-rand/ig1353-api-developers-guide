@@ -40,7 +40,6 @@ Before diving into the technical details, here are key abbreviations and terms u
 |AsciiDoc |AsciiDoc |A lightweight markup language for writing technical documentation  
 |CI/CD |Continuous Integration/Continuous Deployment |Automated practices for integrating code changes and deploying applications
 |CTK |Conformance Test Kit |TMForum's testing framework to validate API implementations
-|DCS |Domain Context Specialization |TMForum's approach to creating specialized versions of APIs for specific domains
 |EPIC |EPIC |Large work items in JIRA that group related user stories or tasks
 |IDE |Integrated Development Environment |Software application providing comprehensive facilities for software development
 |JIRA |JIRA |Project management and issue tracking tool from Atlassian
@@ -405,8 +404,6 @@ Following the above pattern for schema files for resources, the schema file defi
 
 A schema file defining for an *<Entity>* an event *<Event>* is named `<Entity><Event>.schema.json`, and its payload is defined by a file `<Entity><Event>Payload.schema.json`. Both these kinds of files are placed in the "*Event*" subdirectory.
 
-Schema files for entities of a given *<DCS>* (Domain Context Specialization) are located in subdirectories named "*DCS*", with a further subdirectory for each DCS, and the analogue sub-structure as for non-DCS TMF classes, including "*Event*" folders.
-
 The resulting directory structure is as follows:
 
 image::images/part3-schema-directory-structure.svg[layout of schema directory structure]
@@ -582,22 +579,12 @@ Within the TMF OpenAPI repository, only https://datatracker.ietf.org/doc/html/rf
 
 _Path-Part_
 
-In the _API Rules files_, the reference to a resource's JSON Schema file is relative to the root of the OpenAPI repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>`). Following the above defined Schema Repository Structure, its path part begins with `schema/Tmf/<Domain>`, possibly followed by `DCS`, specific `<DCS>` and/or `Event` segments, and the schema file name `<Entity>.schema.json`, resulting in any of the following alternatives:
+In the _API Rules files_, the reference to a resource's JSON Schema file is relative to the root of the OpenAPI repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>`). Following the above defined Schema Repository Structure, its path part begins with `schema/Tmf/<Domain>`, possibly followed by `Event` segments, and the schema file name `<Entity>.schema.json`, resulting in any of the following alternatives:
 
 * References to a standard <Entity> or related <Event> schema file:
 
   schema/Tmf/<Domain>/<Entity>.schema.json
   schema/Tmf/<Domain>/Event/<Entity><Event>.schema.json
-
-* For DCS schemas shared by several DCSs:
-
-  schema/Tmf/<Domain>/DCS/<Entity>.schema.json
-  schema/Tmf/<Domain>/DCS/Event/<Entity><Event>.schema.json
-
-* For schemas of a specific <DCS>:
-
-  schema/Tmf/<Domain>/DCS/<DCS>/<Entity>.schema.json
-  schema/Tmf/<Domain>/DCS/<DCS>/Event/<Entity><Event>.schema.json
 
 Note that event payload schemas are only referred by their respective event schema.
 
@@ -620,11 +607,6 @@ Examples:
 * References from an event payload schema file to its entity schema file:
 
   ../<Entity>.schema.json
-
-* and similar references from a DCS schema file to some other schema file.
-+
-Note that DCS schemas are not referred from non-DCS schema files,
-and schema files of a specific <DCS> are not referred from the shared DCS schema files.
 
 Note that event payload schemas are only referred by their respective event schema.
 
