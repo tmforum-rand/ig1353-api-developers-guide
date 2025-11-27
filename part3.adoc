@@ -108,11 +108,9 @@ The production process consists of several interconnected stages:
 
 === Understanding the Dependencies
 
-Each step depends on the previous ones, creating a pipeline where:
+To author an API, the user creates a series of inputs that are combined to create the API assets we publish for users. An overview of the inputs and the resulting assets is shown in the diagram below:
 
-* Changes to the rules file trigger OAS regeneration
-* Schema modifications affect both OAS and diagram generation
-* All artifacts must be regenerated when core definitions change
+image::images/api-assets-overview.svg[API Assets diagram]
 
 This automated approach ensures consistency across all deliverables while reducing manual effort and potential errors.
 

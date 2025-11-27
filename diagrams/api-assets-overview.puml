@@ -1,0 +1,25 @@
+@startuml
+skinparam packageStyle rectangle
+
+package "Inputs" {
+  [Schemas] as schemas
+  [Examples] as examples
+  [Rules File] as rules
+  [User Guide adoc] as ug_adoc
+  [conformance.yaml] as confy
+}
+
+package "Outputs" {
+  [OpenAPI (OAS)] as OAS
+  [User Guide] as UserGuide
+  [Conformance Profile] as ConformanceProfile
+}
+
+schemas --> rules
+examples --> rules
+rules --> OAS
+confy --> ConformanceProfile
+rules --> UserGuide
+ug_adoc --> UserGuide
+
+@enduml
