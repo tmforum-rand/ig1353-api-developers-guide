@@ -95,16 +95,26 @@ This separation allows for more efficient tracking of different types of work wh
 
 The TMForum API development process follows a structured approach to transform business requirements into fully documented and tested API specifications. The process involves several automated generation steps:
 
+=== API Project Structure
+
+Each API version folder contains:
+ - a configuration file, stating which version of the schemas collection and the tools should be used to generate the outputs for this API
+ - a rules file, describing the API interface itself and including examples of API usage
+ - a conformance profile, describing the expected behaviour of different API payload prooperties (generated once the rules file is complete)
+ - documentation for users of the API
+
+During the development phase, a local copy of the schemas collection can be used and edited; these changes are captured into a new version when the pull request is merged.
+
 === API Generation Pipeline
 
 The production process consists of several interconnected stages:
 
-1. **OAS Specification Generation**: The OpenAPI Specification (OAS) file is automatically generated from the API rules file and JSON schema definitions
+1. **OAS Specification Generation**: The OpenAPI Specification (OAS) file is automatically generated from the configuration, API rules file, and JSON schema definitions
 2. **PlantUML Diagram Generation**: UML class diagrams are automatically created to visualize the API's data model and relationships
-3. **Conformance Profile Generation**: Test specifications are generated to define what constitutes a compliant implementation
-4. **CTK Generation**: The Conformance Test Kit (CTK) is built to provide executable tests for API implementations
-5. **RI/Sample Code Generation**: Reference Implementation (RI) code samples are produced to demonstrate proper API usage
-6. **The Publication Process**: Final artifacts are packaged and published to the TMForum catalog
+3. **Conformance Profile Generation**: Test specifications are generated to define what constitutes a compliant implementation, authors can edit this file once created
+4. **Conformance Profile Document Generation**: Human-readable formatted conformance information
+5. **User Guide Document Generation**: The API rules file is combined with the diagrams and additional user guide content to create the User Guide document
+6. **Postman Collection Generation**: The OAS file is converted to Postman format
 
 === Understanding the Dependencies
 
