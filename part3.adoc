@@ -734,7 +734,7 @@ Custom rules should align with TMForum API Design Guidelines while addressing sp
 
 === Configuration File Deep Dive
 
-The configuration file is named `config.json` and holds options about the API build process rather than the API itself.
+The configuration file is named `config.yaml` and holds options about the API build process rather than the API itself.
 The available configuration options are described in table below:
 
 [cols="2,8"]
