@@ -732,6 +732,27 @@ When standard patterns don't fit your API requirements:
 
 Custom rules should align with TMForum API Design Guidelines while addressing specific domain needs.
 
+=== Configuration File Deep Dive
+
+The configuration file is named `config.json` and holds options about the API build process rather than the API itself.
+The available configuration options are described in table below:
+
+[cols="2,8"]
+|===
+2+h**|oasTooling**
+
+|version
+|When developing an API, update to the latest tooling version by checking the list here: https://github.com/tmforum-rand/oas-tooling/releases
+
+2+h|**schemas**
+
+|version
+|Find the available schema collection versions here: https://github.com/tmforum-rand/oas-tooling/releases and update this value when working on a new version of an API
+
+|devMode
+|Optional, default false. Add this configuration set to true when working on a pull request that includes schema changes.
+|===
+
 === Troubleshooting
 
 API development can encounter various technical issues. This section provides guidance on common problems and their solutions.
