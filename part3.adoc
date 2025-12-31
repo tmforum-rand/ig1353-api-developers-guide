@@ -742,16 +742,18 @@ The available configuration options are described in table below:
 2+h**|oasTooling**
 
 |version
-|When developing an API, update to the latest tooling version by checking the list here: https://github.com/tmforum-rand/oas-tooling/releases
+|Set the tooling version to use, the list of available versions is here (usually use the newest): https://github.com/tmforum-rand/oas-tooling/releases. A value of `latest` may also be used during API development.
 
 2+h|**schemas**
 
 |version
-|Find the available schema collection versions here: https://github.com/tmforum-rand/oas-tooling/releases and update this value when working on a new version of an API
+|Find the available schema collection versions here: https://github.com/tmforum-rand/oas-tooling/releases and update this value when working on a new version of an API. A value of `latest` may also be used during API development.
 
 |devMode
 |Optional, default false. Add this configuration set to true when working on a pull request that includes schema changes.
 |===
+
+When published, the configuration file does not include `devMode`. It also uses specific versions rather than `latest`.
 
 === Troubleshooting
 
