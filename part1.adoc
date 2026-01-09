@@ -24,7 +24,7 @@ This “How To” document set provides onboarding instructions and a user-guide
 |*Part One: Initial Onboarding* |Prerequisites/Good To Know, First-Time Onboarding
 |*Part Two: Starting a New API* |API Inception, API Profile, Getting an API Number
 |*Part Three: The API Development Loop* |Admin: JIRA issues, Git issues and Branching, API Tools, How To Deep-Dives
-|*Part Four: Advanced API Development* |ASyncAPI Specifications, How to make a DCS (Domain Context Specialization) API, How to make a Composite API
+|*Part Four: Advanced API Development* |API Specialization, Async APIs
 |===
 
 
@@ -39,8 +39,8 @@ The TMForum uses a variety of collaboration tools to coordinate the requirements
 |===
 |Document/Website |What Is It |Further Reading
 
-|Swagger/OAS files |The OpenAPI Specification (OAS) is a framework used by developers to build applications that interact with REST (Representational State Transfer) APIs. REST is an architectural style for designing networked applications. The specification defines how to communicate with an API, what information can be requested, and what information can be returned. | https://swagger.io/specification/[OpenAPI Specification], https://swagger.io/specification/v2/[Swagger 2 Specification]
-|TMF Forum API Design Guidelines |REST itself is only a paradigm. The TMForum has written down a number of 'positions' taken in the specific design of REST API specifications, such as Entity CRUD (Create, Read, Update, Delete) operations and Task operations, filtering and attribute selection and many more | https://www.tmforum.org/resources/specification/tmf630-rest-api-design-guidelines-4-2-0/[TMForum API Design Guidelines v4.2.0]
+|OAS files |The OpenAPI Specification (OAS) is a description format for REST (REpresentational State Transfer) APIs. REST is an architectural style for designing networked applications. The specification defines how to communicate with an API, what information can be requested, and what information can be returned. | https://spec.openapis.org/oas/v3.0.4.html[OpenAPI Specification]
+|TMF Forum API Design Guidelines |REST itself is only a paradigm. The TMForum has written down a number of 'positions' taken in the specific design of REST API specifications, such as Entity CRUD (Create, Read, Update, Delete) operations and Task operations, filtering and attribute selection and many more | https://www.tmforum.org/resources/specification/tmf630-rest-api-design-guidelines-4-2-0/[TMForum API Design Guidelines v4.2.0], https://github.com/tmforum-rand/tmf630-api-design-guidelines[TMForum API Design Guidelines on GitHub]
 |GitHub and Codespaces |GitHub is a website and cloud-based service that helps developers store and manage their code, as well as track and control changes to their code through Version control. | https://docs.github.com/en/get-started/start-your-journey/hello-world[GitHub: Hello World]
 |Microsoft Visual Studio Code |GitHub Codespaces is a cloud-based development environment that allows developers to work on their local development environment on any device and from anywhere. Visual Studio Code is a rich text editor like Sublime Text and Atom. TMForum use a hosted browser-based version of this through Codespaces. | https://docs.github.com/en/codespaces/getting-started/deep-dive[Deep dive into GitHub Codespaces]
 |editor.swagger.io |The Swagger Editor is an open source editor to design, define and document HTTP-based and event-driven APIs using the OpenAPI and AsyncAPI specifications, respectively. | https://editor.swagger.io
@@ -91,7 +91,7 @@ Once you have joined this button will become red and you can *VIEW PROJECT*:
 
 image::images/part1-viewProject.png[Joining,618,80,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
 
-This will take you to the API Project Home Page within TMForum.org (https://projects.tmforum.org/wiki/display/AP/Open+API+Project+Home). This is hosted in TMForum's private Confluence site. This home page will lay out the people involved (this is where the photos are useful), the workstreams and team calendar (https://projects.tmforum.org/wiki/display/AP/Open+APIs+calendar). By joining the team you should receive calendar invites to each of the API program meetings.
+This will take you to the API Project Home Page within TMForum.org (https://projects.tmforum.org/wiki/display/AP/Open+API+Project+Home). This is hosted in TMForum's private Confluence site. This home page will lay out the people involved (this is where the photos are useful), the workstreams and team calendar (https://projects.tmforum.org/wiki/display/AP/Open+APIs+calendar). By joining the team you should receive calendar invites to each of the API program meetings. You are not obliged or expected to attend all of these meetings, but it would be useful to "tune in" to the agendas, priorities and people involved. As a new API developer, attending these meetings will help you understand the collaborative development process and connect with other developers in the community.
 
 === Joining the TMForum's Private GitHub Repository
 
@@ -109,22 +109,6 @@ This is currently done by filling out a simple request form accessed here with y
 https://projects.tmforum.org/jira/servicedesk/customer/portal/3/create/102
 
 image::images/part1-github-request-form.png[Registration,414,508,align="center",link=https://myaccount.tmforum.org/joinproject,window=_blank]
-
-
-=== Team Meetings
-
-The most up-to-date list of meetings should be available from the above team home page. You are not obliged or expected to attend all of these meetings, but it would be useful to "tune in" to the agendas, priorities and people involved. As a new API developer, attending these meetings will help you understand the collaborative development process and connect with other developers in the community. Some of the main recurring meetings are:
-
-[options=header,cols="25h,~,~",stripes=even]
-|===
-|Day and Time |Meeting Title |Description
-
-|Monday @ 14:00 GMT/ 15:00 CET/ 10:00 ET|API Factory Call |Discussion of the issues and evolution of the tooling and end-to-end CI/CD process
-|Wednesday @ 13:00 GMT/ 14:00 CET/ 09:00 ET|API Program Call |A weekly review of ongoing API developments and general planning (SpecJam etc)
-|Wednesday @ 14:00 GMT/ 15:00 CET/ 10:00 ET|API Governance Call |A weekly review of new technical issues raised (improvements, bugs) in existing APIs
-|Thursday @ 15:00 GMT/ 16:00 CET/ 11:00 ET|API Architecture Call |A technical discussion of design patterns that might impact our design guidelines
-
-|===
 
 == Administrative Appendix
 

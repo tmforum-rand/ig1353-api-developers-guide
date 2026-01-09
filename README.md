@@ -37,6 +37,21 @@ The asciidoc files are rendered with Ruby/Asciidoctor
 - https://github.com/asciidoctor/asciidoctor-diagram - Enables diagram support (PlantUML, Graphviz, etc.)
   gem install asciidoctor-diagram
 
+#### Optional Dependencies
+
+For regenerating diagrams from source files in `diagrams/`:
+- https://plantuml.com/ - Generates diagrams from `.puml` source files
+  - macOS: `brew install plantuml`
+  - Other: See https://plantuml.com/download
+
+Note: Pre-generated diagram images are included in `images/`, so PlantUML is only needed if you modify diagram source files in `diagrams/`.
+
+### Project Structure
+
+- `diagrams/` - Source files for diagrams (`.puml` files)
+- `images/` - Generated diagrams and static images (version controlled for GitHub preview)
+- `output/` - Generated documentation files (PDFs and HTML)
+
 ### Usage
 
 Run the `./render.sh` command to get PDF and HTML versions of the documents in the `output/` folder.

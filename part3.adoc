@@ -22,7 +22,7 @@ This “How To” document set provides onboarding instructions and a user-guide
 |*Part One: Initial Onboarding* |Prerequisites/Good To Know, First-Time Onboarding
 |*Part Two: Starting a New API* |API Inception, API Profile, Getting an API Number
 |*Part Three: The API Development Loop* |Admin: JIRA issues, Git issues and Branching, API Tools, How To Deep-Dives
-|*Part Four: Advanced API Development* |ASyncAPI Specifications, How to make a DCS API, How to make a Composite API
+|*Part Four: Advanced API Development* |API Specialization, Async APIs
 |===
 
 
@@ -40,7 +40,6 @@ Before diving into the technical details, here are key abbreviations and terms u
 |AsciiDoc |AsciiDoc |A lightweight markup language for writing technical documentation  
 |CI/CD |Continuous Integration/Continuous Deployment |Automated practices for integrating code changes and deploying applications
 |CTK |Conformance Test Kit |TMForum's testing framework to validate API implementations
-|DCS |Domain Context Specialization |TMForum's approach to creating specialized versions of APIs for specific domains
 |EPIC |EPIC |Large work items in JIRA that group related user stories or tasks
 |IDE |Integrated Development Environment |Software application providing comprehensive facilities for software development
 |JIRA |JIRA |Project management and issue tracking tool from Atlassian
@@ -109,11 +108,9 @@ The production process consists of several interconnected stages:
 
 === Understanding the Dependencies
 
-Each step depends on the previous ones, creating a pipeline where:
+To author an API, the user creates a series of inputs that are combined to create the API assets we publish for users. An overview of the inputs and the resulting assets is shown in the diagram below:
 
-* Changes to the rules file trigger OAS regeneration
-* Schema modifications affect both OAS and diagram generation
-* All artifacts must be regenerated when core definitions change
+image::images/api-assets-overview.svg[API Assets diagram]
 
 This automated approach ensures consistency across all deliverables while reducing manual effort and potential errors.
 
@@ -405,8 +402,6 @@ Following the above pattern for schema files for resources, the schema file defi
 
 A schema file defining for an *<Entity>* an event *<Event>* is named `<Entity><Event>.schema.json`, and its payload is defined by a file `<Entity><Event>Payload.schema.json`. Both these kinds of files are placed in the "*Event*" subdirectory.
 
-Schema files for entities of a given *<DCS>* (Domain Context Specialization) are located in subdirectories named "*DCS*", with a further subdirectory for each DCS, and the analogue sub-structure as for non-DCS TMF classes, including "*Event*" folders.
-
 The resulting directory structure is as follows:
 
 image::images/part3-schema-directory-structure.svg[layout of schema directory structure]
@@ -582,22 +577,12 @@ Within the TMF OpenAPI repository, only https://datatracker.ietf.org/doc/html/rf
 
 _Path-Part_
 
-In the _API Rules files_, the reference to a resource's JSON Schema file is relative to the root of the OpenAPI repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>`). Following the above defined Schema Repository Structure, its path part begins with `schema/Tmf/<Domain>`, possibly followed by `DCS`, specific `<DCS>` and/or `Event` segments, and the schema file name `<Entity>.schema.json`, resulting in any of the following alternatives:
+In the _API Rules files_, the reference to a resource's JSON Schema file is relative to the root of the OpenAPI repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>`). Following the above defined Schema Repository Structure, its path part begins with `schema/Tmf/<Domain>`, possibly followed by `Event` segments, and the schema file name `<Entity>.schema.json`, resulting in any of the following alternatives:
 
 * References to a standard <Entity> or related <Event> schema file:
 
   schema/Tmf/<Domain>/<Entity>.schema.json
   schema/Tmf/<Domain>/Event/<Entity><Event>.schema.json
-
-* For DCS schemas shared by several DCSs:
-
-  schema/Tmf/<Domain>/DCS/<Entity>.schema.json
-  schema/Tmf/<Domain>/DCS/Event/<Entity><Event>.schema.json
-
-* For schemas of a specific <DCS>:
-
-  schema/Tmf/<Domain>/DCS/<DCS>/<Entity>.schema.json
-  schema/Tmf/<Domain>/DCS/<DCS>/Event/<Entity><Event>.schema.json
 
 Note that event payload schemas are only referred by their respective event schema.
 
@@ -620,11 +605,6 @@ Examples:
 * References from an event payload schema file to its entity schema file:
 
   ../<Entity>.schema.json
-
-* and similar references from a DCS schema file to some other schema file.
-+
-Note that DCS schemas are not referred from non-DCS schema files,
-and schema files of a specific <DCS> are not referred from the shared DCS schema files.
 
 Note that event payload schemas are only referred by their respective event schema.
 
@@ -801,69 +781,79 @@ Quality assurance is critical for TMForum APIs. These checklists provide quick v
 As people often start a new rules file with a copy-and-paste from a previous existing file - it is easy for "working errors" to permeate unnoticed. Review these items carefully:
 
 **API Metadata:**
-* [ ] **API Name**: Follows TMForum naming conventions (typically ends with "Management" for resource management APIs)
-* [ ] **API Version**: Strictly follows SemVer.org format (major.minor.patch, e.g., "5.0.0")
-* [ ] **API Description**: Concise and clear, avoiding formatting characters and non-ASCII symbols
-* [ ] **TMF ID**: Correct three-digit TMForum identifier (e.g., "TMF620")
-* [ ] **Host URL**: Uses correct server URL format, not legacy `basePath` attribute
+
+* **API Name**: Follows TMForum naming conventions (typically ends with "Management" for resource management APIs)
+* **API Version**: Strictly follows SemVer.org format (major.minor.patch, e.g., "5.0.0")
+* **API Description**: Concise and clear, avoiding formatting characters and non-ASCII symbols
+* **TMF ID**: Correct three-digit TMForum identifier (e.g., "TMF620")
+* **Host URL**: Uses correct server URL format, not legacy `basePath` attribute
 
 **Common Copy-Paste Errors:**
-* [ ] API name updated from source template
-* [ ] TMF ID changed from source template
-* [ ] Resource names reflect your API, not the source API
-* [ ] Schema references point to your domain directory
-* [ ] Example file paths updated to your API structure
+
+* API name updated from source template
+* TMF ID changed from source template
+* Resource names reflect your API, not the source API
+* Schema references point to your domain directory
+* Example file paths updated to your API structure
 
 **Technical Validation:**
-* [ ] No errors in Express UI checklist tab
-* [ ] No errors in Express UI examples validation
-* [ ] No errors in generation output window
-* [ ] No errors in pull request validation checks
+
+* No errors in Express UI checklist tab
+* No errors in Express UI examples validation
+* No errors in generation output window
+* No errors in pull request validation checks
 
 ==== Schema Files Quality Checklist
 
 Schema files define the structure of your API data. Common issues include:
 
 **Reference Format:**
-* [ ] All `$ref` paths use correct format: `../Domain/EntityName.schema.json#/definitions/EntityName`
-* [ ] Schema file names match entity names exactly
-* [ ] Directory structure follows TMForum conventions
+
+* All `$ref` paths use correct format: `../Domain/EntityName.schema.json#/definitions/EntityName`
+* Schema file names match entity names exactly
+* Directory structure follows TMForum conventions
 
 **Description Quality:**
-* [ ] Attribute descriptions are generic enough for reuse across APIs
-* [ ] Common schema descriptions avoid API-specific references
-* [ ] All required fields have clear descriptions
+
+* Attribute descriptions are generic enough for reuse across APIs
+* Common schema descriptions avoid API-specific references
+* All required fields have clear descriptions
 
 **Schema Validation:**
-* [ ] JSON schema syntax is valid
-* [ ] All referenced schemas exist
-* [ ] Required fields are appropriate for the entity
-* [ ] Data types are correctly specified
+
+* JSON schema syntax is valid
+* All referenced schemas exist
+* Required fields are appropriate for the entity
+* Data types are correctly specified
 
 ==== Examples Quality Checklist
 
 Examples are crucial for API usability. Verify:
 
 **Reference Examples:**
-* [ ] All `<Entity>Ref` examples include required fields
-* [ ] `@referredType` field is properly populated
-* [ ] `id` and `href` values are consistent with each other
+
+* All `<Entity>Ref` examples include required fields
+* `@referredType` field is properly populated
+* `id` and `href` values are consistent with each other
 
 **Notification Examples:**
-* [ ] **Create events**: Payload shows the complete entity
-* [ ] **Attribute change events**: Payload shows only `@` properties, `id`, `href`, and changed properties
-* [ ] **Status change events**: Payload shows only `@` properties, `id`, `href`, and status/state changes
-* [ ] **Delete events**: Payload shows only `@` properties, `id`, and `href`
+
+* **Create events**: Payload shows the complete entity
+* **Attribute change events**: Payload shows only `@` properties, `id`, `href`, and changed properties
+* **Status change events**: Payload shows only `@` properties, `id`, `href`, and status/state changes
+* **Delete events**: Payload shows only `@` properties, `id`, and `href`
 
 **PATCH Operation Examples:**
-* [ ] All four PATCH formats included (JSON Merge Patch, JSON Patch, etc.)
-* [ ] Both request and response examples provided for each format
-* [ ] Examples demonstrate realistic use cases
+
+* All four PATCH formats included (JSON Merge Patch, JSON Patch, etc.)
+* Both request and response examples provided for each format
+* Examples demonstrate realistic use cases
 
 **Data Consistency:**
-* [ ] `id` values match the last segment of corresponding `href` values
-* [ ] Placeholder values replaced with realistic data
-* [ ] Examples validate against the generated OAS specification
+
+* `id` values match the last segment of corresponding `href` values
+* Placeholder values replaced with realistic data
+* Examples validate against the generated OAS specification
 
 Use these checklists during development and before submitting APIs for review to ensure high quality and consistency.
 
@@ -871,19 +861,19 @@ Use these checklists during development and before submitting APIs for review to
 
 Please consider the following checklist before submitting your API for review:
 
-* [ ] No errors are shown on the Checklist tab in the Express UI after selecting your API
-* [ ] No errors are shown on the Examples tab in the Express UI after selecting your API and choosing to validate examples
-* [ ] No errors are shown in the output window of the Express UI when you generate the various assets (OAS file, user guide, conformance profile)
-* [ ] No errors are shown at the bottom of your pull request, as a result of running the automatic validations.
-* [ ] In your examples, ensure that `<entity>Ref` examples include the correct fields, including `@referredType` populated
-* [ ] In your examples for notifications, ensure that you abide by the rules:
-  ** [ ] Create event – the payload should show the entire entity
-  ** [ ] Attribute change event – the payload should show only the `@` properties, `id`, `href`, and the changed properties (in PATCH Merge format)
-  ** [ ] Status change event – the payload should show only the `@` properties, `id`, `href`, and the changed status/state value
-  ** [ ] Delete event – the payload should show only the `@` properties, `id`, `href`
-* [ ] In your examples for PATCH operation, ensure that you have all four example formats, with both request and response for each example
-* [ ] In your examples, ensure that the `id` and `href` are consistent with each other (basically the `id` should be identical to the last part of the `href`, after the rightmost `/` character)
-* [ ] If you use the example generation tool, ensure that you have replaced all the placeholder dummy strings and values with realistic values
+* No errors are shown on the Checklist tab in the Express UI after selecting your API
+* No errors are shown on the Examples tab in the Express UI after selecting your API and choosing to validate examples
+* No errors are shown in the output window of the Express UI when you generate the various assets (OAS file, user guide, conformance profile)
+* No errors are shown at the bottom of your pull request, as a result of running the automatic validations.
+* In your examples, ensure that `<entity>Ref` examples include the correct fields, including `@referredType` populated
+* In your examples for notifications, ensure that you abide by the rules:
+** Create event – the payload should show the entire entity
+** Attribute change event – the payload should show only the `@` properties, `id`, `href`, and the changed properties (in PATCH Merge format)
+** Status change event – the payload should show only the `@` properties, `id`, `href`, and the changed status/state value
+** Delete event – the payload should show only the `@` properties, `id`, `href`
+* In your examples for PATCH operation, ensure that you have all four example formats, with both request and response for each example
+* In your examples, ensure that the `id` and `href` are consistent with each other (basically the `id` should be identical to the last part of the `href`, after the rightmost `/` character)
+* If you use the example generation tool, ensure that you have replaced all the placeholder dummy strings and values with realistic values
 
 
 == Administrative Appendix

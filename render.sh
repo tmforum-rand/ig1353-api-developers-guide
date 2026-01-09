@@ -40,6 +40,39 @@ if [ -d "${FONTS_DIR}" ]; then
     echo "Using fonts directory: ${FONTS_DIR}"
 fi
 
+# Build diagrams from source files
+DIAGRAMS_DIR="diagrams"
+IMAGES_DIR="images"
+
+if [ -d "${DIAGRAMS_DIR}" ] && command -v plantuml &> /dev/null; then
+    echo "Building diagrams..."
+    diagram_count=0
+
+    for puml_file in "${DIAGRAMS_DIR}"/*.puml; do
+        if [ -f "$puml_file" ]; then
+            base_name=$(basename "$puml_file" .puml)
+            output_svg="${IMAGES_DIR}/${base_name}.svg"
+
+            # Check if diagram needs to be rebuilt (source newer than output, or output doesn't exist)
+            if [ ! -f "$output_svg" ] || [ "$puml_file" -nt "$output_svg" ]; then
+                echo "  → Generating ${base_name}.svg..."
+                plantuml -tsvg -o "../${IMAGES_DIR}" "$puml_file"
+                ((diagram_count++))
+            fi
+        fi
+    done
+
+    if [ $diagram_count -eq 0 ]; then
+        echo "  ✓ All diagrams up to date"
+    else
+        echo "  ✓ Generated $diagram_count diagram(s)"
+    fi
+elif [ -d "${DIAGRAMS_DIR}" ]; then
+    echo "Warning: plantuml command not found - diagram generation skipped"
+    echo "  Generated diagrams in ${IMAGES_DIR}/ will be used"
+    echo "  Install with: brew install plantuml (macOS) or see https://plantuml.com/download"
+fi
+
 # Build each part*.adoc file
 for adoc_file in part*.adoc; do
     if [ -f "$adoc_file" ]; then
