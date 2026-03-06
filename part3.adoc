@@ -711,6 +711,14 @@ The profile is automatically generated from your rules file, particularly:
 * Parameter restrictions (specified in `parameterRestrictions`)
 * Required notification events
 
+You can regenerate the conformance profile without losing existing content by creating the file `documentation/conformance/config.yaml` with the line:
+
+```yaml
+updateConformanceYaml: true
+```
+
+It is not recommended to commit this change to source control.
+
 ==== How to Read the Profile
 
 The conformance profile uses a structured format:
