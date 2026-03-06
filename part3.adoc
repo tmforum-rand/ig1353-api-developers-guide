@@ -698,6 +698,37 @@ State transition diagrams and lifecycle illustrations help users understand:
 
 These diagrams are typically hand-crafted using PlantUML and integrated into the generated documentation.
 
+[[userguide-cover-page]]
+==== Cover Page
+
+The cover page holds the document control information. The fields used are shown in the table below.
+
+[cols="1,3"]
+|===
+| Field | Description
+
+| `:RELEASE-STATUS:`
+| The document status, either "Preview" or "Production"
+
+| `:MATURITY-LEVEL:`
+| "General availability (GA)"
+
+| `:TEAM-DATE:`
+| When the team/architect approved the document, in the format `dd-Mmm-yyyy`
+
+| `:APPROVAL-STATUS:`
+| "Team Approved"
+
+| `:IPR-MODE:`
+| "RAND"
+
+| `:VERSION:`
+| The full version of this API, e.g. "5.1.2"
+
+|===
+
+Update or add the values in the `userguide.adoc` file.
+
 === Conformance Profile Deep Dive
 
 The Conformance Profile defines exactly what an API implementation must support to be considered compliant with the TMForum specification.
@@ -739,6 +770,10 @@ When standard patterns don't fit your API requirements:
 5. **Update documentation**: Ensure the User Guide reflects the custom requirements
 
 Custom rules should align with TMForum API Design Guidelines while addressing specific domain needs.
+
+==== Cover Page
+
+The conformance profile document includes a cover page with document control information. The fields and format are the same as for the User Guide; see <<userguide-cover-page>> in the User Guide Deep Dive section for details.
 
 === Configuration File Deep Dive
 
