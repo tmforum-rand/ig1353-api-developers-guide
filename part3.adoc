@@ -651,6 +651,57 @@ npm run generate
 cat generated/openapi.yaml
 ```
 
+**Using the OpenAPI generators:**
+
+As an additional validation step, it is useful to generate code from the produced OAS file using https://openapi-generator.tech/[OpenAPI Generator]. This helps detect issues that may not be obvious from OAS validation alone, especially around inheritance, discriminator handling and payload binding.
+
+When using OpenAPI Generator, check all of the following:
+
+1. Generate code to confirm that the generator can produce a usable project from the OAS file.
+2. Compile the generated code, or build the generated project, to confirm that the output is syntactically correct.
+3. Check that example payloads can be serialized and deserialized correctly to confirm that the generated code binds properly to the OAS models. This is especially important for polymorphic types.
+
+For Java and Spring, the following Docker-based  configuration can be used:
+
+```bash
+docker run --rm \
+  -v "$(pwd)/generated/openapi.yaml:/local/openapi.yaml:ro" \
+  -v "$(pwd)/out:/local/out" \
+  openapitools/openapi-generator-cli:latest \
+  generate \
+  -i /local/openapi.yaml \
+  -g spring \
+  -o /local/out \
+  --additional-properties "sourceFolder=src/main/java,dateLibrary=java11,useBeanValidation=true,openApiNullable=false,useJakartaEe=true,useSpringBoot3=true"
+```
+
+If the generated Spring project uses Maven, a typical follow-up build check is:
+
+```bash
+cd out
+mvn clean package
+```
+
+After the build succeeds, verify that representative example payloads from the API can be read into and written from the generated model classes. This is the most reliable way to catch binding problems with `oneOf`, `allOf`, discriminator mappings and inherited types before the API is published.
+
+INFO: For some target languages and frameworks, including Java/Spring, correct model binding for polymorphic types may require `legacyDiscriminatorBehavior=true`. If generated code does not bind discriminator-based models correctly, regenerate using this additional property.
+
+Example with the legacy discriminator option enabled:
+
+```bash
+docker run --rm \
+  -v "$(pwd)/generated/openapi.yaml:/local/openapi.yaml:ro" \
+  -v "$(pwd)/out:/local/out" \
+  openapitools/openapi-generator-cli:latest \
+  generate \
+  -i /local/openapi.yaml \
+  -g spring \
+  -o /local/out \
+  --additional-properties "sourceFolder=src/main/java,dateLibrary=java11,useBeanValidation=true,openApiNullable=false,useJakartaEe=true,useSpringBoot3=true,legacyDiscriminatorBehavior=true"
+```
+
+
+
 **Validation and Review:**
 
 After generation, always review:
@@ -838,6 +889,10 @@ The Express WebUI provides a user-friendly interface for API generation, but sev
 * **Symptom**: YAML parsing errors during generation
 * **Cause**: Incorrect indentation or invalid YAML syntax
 * **Solution**: Use a YAML validator or IDE with YAML support to check syntax
+
+==== Generating code from OAS file
+
+
 
 ==== Getting Help
 
