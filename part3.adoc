@@ -199,6 +199,41 @@ If you click on this globe icon, the Web UI tab should be recreated.
 
 This link (https://docs.github.com/en/codespaces/getting-started/quickstart) describes the basics of using Codespaces, including source control and extensions.
 
+*In order to switch the previous tooling version (i.e v8.6.6, v8.6.5.. so on)*
+
+[NOTE]
+====
+To remove the existing oas-tooling container (for example, if it is running with `oas-tooling:latest`) and restart with a specific tooling version, follow these steps.
+
+.Latest version of tooling: `v8.6.7`
+
+1. Remove the existing container:
++
+[source,bash]
+----
+docker rm -f oas-tooling
+----
+
+2. Start the tooling with the required version (replace `v8.6.6` with your desired version):
++
+[source,bash]
+----
+docker run -d --restart=always -p 3000:3000 --name oas-tooling \
+  -v /workspaces/OAS_Open_API_And_Data_Model/apis/:/home/node/apis \
+  -v /workspaces/OAS_Open_API_And_Data_Model/schemas/:/home/node/schemas \
+  ghcr.io/tmforum-rand/oas-tooling/oas-tooling:v8.6.6
+----
+
+Alternatively, you can use the provided script:
+
+[source,bash]
+----
+./.devcontainer/library-scripts/start-oas-tooling.sh v8.6.6
+----
+
+3.Once the previous tooling version is running successfully, open the "Ports" tab, relaunch the web server/GUI, and perform your testing.
+====
+
 == Rules File Deep Dive
 
 The TMF API rules file, along with JSON schema files - form the main areas of influence in the construction of a TMF API. Your main activity will be in crafting this rules file together with the associated JSON-Schema files to ensure that the naming and description of entities, properties, operations, notifications and overall structure "hang together" to describe your intensions in agreement with the TMForum API Design Guidelines.
