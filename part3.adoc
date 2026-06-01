@@ -199,9 +199,10 @@ If you click on this globe icon, the Web UI tab should be recreated.
 
 This link (https://docs.github.com/en/codespaces/getting-started/quickstart) describes the basics of using Codespaces, including source control and extensions.
 
-*In order to switch the previous tooling version (i.e v8.6.6, v8.6.5.. so on)*
+=== Change the tooling version used in CodeSpace
 
-[NOTE]
+*In order to switch to an alternative tooling version (i.e v8.6.6, v8.6.5.. so on)*
+
 ====
 To remove the existing oas-tooling container (for example, if it is running with `oas-tooling:latest`) and restart with a specific tooling version, follow these steps.
 
@@ -218,20 +219,21 @@ docker rm -f oas-tooling
 +
 [source,bash]
 ----
-docker run -d --restart=always -p 3000:3000 --name oas-tooling \
-  -v /workspaces/OAS_Open_API_And_Data_Model/apis/:/home/node/apis \
-  -v /workspaces/OAS_Open_API_And_Data_Model/schemas/:/home/node/schemas \
-  ghcr.io/tmforum-rand/oas-tooling/oas-tooling:v8.6.6
+./.devcontainer/library-scripts/start-oas-tooling.sh v8.6.6
 ----
 
 Alternatively, you can use the provided script:
 
 [source,bash]
 ----
-./.devcontainer/library-scripts/start-oas-tooling.sh v8.6.6
+docker run -d --restart=always -p 3000:3000 --name oas-tooling \
+  -v /workspaces/OAS_Open_API_And_Data_Model/apis/:/home/node/apis \
+  -v /workspaces/OAS_Open_API_And_Data_Model/schemas/:/home/node/schemas \
+  ghcr.io/tmforum-rand/oas-tooling/oas-tooling:v8.6.6
 ----
 
-3.Once the previous tooling version is running successfully, open the "Ports" tab, relaunch the web server/GUI, and perform your testing.
+
+3.Once the desired tooling version is running successfully, open the "Ports" tab, relaunch the web server/GUI, and perform your testing.
 ====
 
 == Rules File Deep Dive
