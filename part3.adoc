@@ -201,12 +201,7 @@ This link (https://docs.github.com/en/codespaces/getting-started/quickstart) des
 
 === Change the tooling version used in CodeSpace
 
-*In order to switch to an alternative tooling version (i.e v8.6.6, v8.6.5.. so on)*
-
-====
 To remove the existing oas-tooling container (for example, if it is running with `oas-tooling:latest`) and restart with a specific tooling version, follow these steps.
-
-.Latest version of tooling: `v8.6.7`
 
 1. Remove the existing container:
 +
@@ -221,9 +216,9 @@ docker rm -f oas-tooling
 ----
 ./.devcontainer/library-scripts/start-oas-tooling.sh v8.6.6
 ----
-
++
 Alternatively, you can use the provided script:
-
++
 [source,bash]
 ----
 docker run -d --restart=always -p 3000:3000 --name oas-tooling \
@@ -232,9 +227,7 @@ docker run -d --restart=always -p 3000:3000 --name oas-tooling \
   ghcr.io/tmforum-rand/oas-tooling/oas-tooling:v8.6.6
 ----
 
-
-3.Once the desired tooling version is running successfully, open the "Ports" tab, relaunch the web server/GUI, and perform your testing.
-====
+3. Once the desired tooling version is running successfully, open the "Ports" tab, relaunch the web server/GUI, and perform your testing.
 
 == Rules File Deep Dive
 
