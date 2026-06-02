@@ -1,5 +1,382 @@
-= Diagram generation
+= Diagram Generation Configuration Guide
+:toc: left
+:toclevels: 3
+:sectnums:
 
+This guide covers the end-user configurable options for the *diagram generation* tool (`oas-diagrams`). These settings control _how_ diagrams are produced — which types are rendered, how complexity is managed, what appears in the output PlantUML files, and how sub-resources are broken out.
+
+See xref:subset-control[Diagram Subset Control] for controlling which _generated_ diagrams appear in the user guide.
+
+== How Configuration Works
+
+Configuration is layered:
+
+. *Fallback baseline* — minimal structural defaults (`config/fallback.yaml`)
+. *Embedded defaults* — domain-specific overrides merged on top (`config/defaults.yaml`)
+. *User config files* — one or more YAML/JSON files passed via `--config` (last wins)
+
+== Simple Types
+
+Simple types are treated as leaf nodes in diagrams — they are rendered inline and never broken out into separate sub-resource diagrams.
+
+=== `simpleTypes`
+
+An explicit list of type names to treat as simple/leaf:
+
+[source,yaml]
+----
+simpleTypes:
+  - TimePeriod
+  - Money
+  - Quantity
+  - Duration
+  - Tax
+  - Value
+  - Any
+  - object
+  - Number
+  - Date
+----
+
+These types will appear as property type annotations but won't get their own boxes or breakout diagrams.
+
+=== `simpleEndings`
+
+Type name suffixes that mark a type as simple:
+
+[source,yaml]
+----
+simpleEndings:
+  - Type
+  - Error
+----
+
+Any schema ending in `Type` or `Error` (e.g., `StatusType`, `ValidationError`) is treated as a leaf node.
+
+=== `nonSimpleEndings`
+
+Exceptions to `simpleEndings` — suffixes that should *not* be treated as simple even if they match:
+
+[source,yaml]
+----
+nonSimpleEndings:
+  - RefType
+  - TypeRef
+  - RoleType
+----
+
+So `PartyRoleType` would remain a full node despite ending in `Type`, because it ends in `RoleType`.
+
+== Complexity and Breakout Control
+
+This section controls how the tool decides which sub-resources to break out into separate diagrams.
+
+=== `subResourceConfig`
+
+Explicitly defines which sub-resources should be broken out for a given resource, bypassing automatic complexity analysis:
+
+[source,yaml]
+----
+subResourceConfig:
+  Service:
+    - Feature
+    - Characteristic
+    - Intent
+    - IntentExpression
+    - PlaceRefOrValue
+    - EntityRefOrValue
+----
+
+When a resource has an entry here, the listed types are forced as breakouts regardless of the complexity analysis results. This gives precise control over diagram structure for resources where the automatic analysis doesn't produce the desired layout.
+
+=== Strategy Selection
+
+[source,yaml]
+----
+complexity:
+  strategy: path-complexity   # or "graph-analysis" (default)
+----
+
+* *`graph-analysis`* — Uses node count, edge count, and fan-out heuristics to identify breakout candidates.
+* *`path-complexity`* — Computes path-based complexity scores per node; candidates with highest complexity are broken out until the total falls below threshold.
+
+You can also pass `--breakout-strategy path-complexity` on the CLI.
+
+=== Key Thresholds
+
+[source,yaml]
+----
+complexity:
+  enabled: true
+  breakoutSubgraphNodes: 12    # Min nodes a subgraph must have to be a breakout candidate
+  breakoutFanout: 8            # Min fan-out (outbound edges) to trigger breakout
+  minBreakoutNodes: 3          # A breakout diagram must have at least this many nodes
+  breakoutMaxDepth: 2          # Max depth levels for automatic breakout discovery
+  maxNodes: 25                 # Target max nodes per diagram
+  maxEdges: 40                 # Target max edges per diagram
+  excludeEnumsAndRefs: true    # Exclude enums and ref-types from complexity counts
+----
+
+=== Path-Complexity Strategy Additional Settings
+
+[source,yaml]
+----
+complexity:
+  maxComplexity: 2000          # Total complexity budget; candidates subtracted until below this
+  minNodeComplexity: 100       # Minimum complexity score for a node to be a breakout candidate
+  maxDiscriminatorMembers: 4   # Discriminators with more members than this are breakout candidates
+----
+
+=== Wrapper Suppression
+
+[source,yaml]
+----
+complexity:
+  suppressTrivialWrapperBreakouts: true
+----
+
+Prevents breakouts for "wrapper" types whose diagrams would be trivial (all non-Ref children are themselves already broken out). Default: `true`.
+
+== Inheritance and Schema Handling
+
+=== `coreInheritanceTypes`
+
+Types to treat as abstract base classes that get flattened into inheriting types rather than rendered as separate nodes:
+
+[source,yaml]
+----
+coreInheritanceTypes:
+  - Entity
+  - Entity_FVO
+  - Entity_MVO
+  - Extensible
+  - Addressable
+  - Reference
+----
+
+=== `coreInheritanceRegexp`
+
+Regex patterns for additional inheritance type matching:
+
+[source,yaml]
+----
+coreInheritanceRegexp:
+  - "^Gc.*"
+----
+
+=== `subClassExcludeRegexp`
+
+Regex patterns for schema names to exclude entirely from diagram rendering (e.g., create/update variants):
+
+[source,yaml]
+----
+subClassExcludeRegexp:
+  - ".*_Create$"
+  - ".*_Update$"
+  - ".*_FVO$"
+  - ".*_MVO$"
+----
+
+=== `includeInherited`
+
+Whether to show inherited properties in sub-types:
+
+[source,yaml]
+----
+includeInherited: true
+----
+
+=== `expandPropertiesFromAllOfs`
+
+Whether to inline properties from `allOf` base types into the referencing type:
+
+[source,yaml]
+----
+expandPropertiesFromAllOfs: false
+----
+
+== Discriminator (Polymorphism) Settings
+
+=== `includeDiscriminatorMapping`
+
+Show the discriminator mapping values in diagrams:
+
+[source,yaml]
+----
+includeDiscriminatorMapping: true
+----
+
+=== `includeDiscriminatorEdge`
+
+Draw edges from discriminator nodes to their subtypes:
+
+[source,yaml]
+----
+includeDiscriminatorEdge: true
+----
+
+=== `minDiscriminators`
+
+Minimum number of discriminator subtypes before rendering a full discriminator node (below this, subtypes are shown inline):
+
+[source,yaml]
+----
+minDiscriminators: 4
+----
+
+=== `discriminatorSpreadThreshold`
+
+When a discriminator has more subtypes than this, the layout "spreads" them to prevent overcrowding:
+
+[source,yaml]
+----
+discriminatorSpreadThreshold: 5
+----
+
+== Enumeration Display
+
+=== `truncateLargeEnums`
+
+Truncate long enum value lists in diagrams to keep boxes manageable:
+
+[source,yaml]
+----
+truncateLargeEnums: true
+truncateEnumsTrigger: 15     # Truncate if more than this many values
+truncateEnumsCount: 10       # Show this many values before the "truncated" message
+----
+
+=== `includeOrphanEnums`
+
+Include enum types that aren't directly referenced by any resource property:
+
+[source,yaml]
+----
+includeOrphanEnums: true
+----
+
+=== `orphanEnumsByResource`
+
+Assign specific orphan enums to specific resources:
+
+[source,yaml]
+----
+orphanEnumsByResource:
+  TroubleTicket:
+    - TroubleTicketStatusType
+    - TroubleTicketPriorityType
+----
+
+== Properties Display
+
+=== `includeMetaProperties`
+
+Include meta/framework properties (like `@type`, `@baseType`, `@schemaLocation`):
+
+[source,yaml]
+----
+includeMetaProperties: true
+----
+
+=== `onlyMandatoryForPost`
+
+For POST-style operations, only show mandatory properties:
+
+[source,yaml]
+----
+onlyMandatoryForPost: true
+----
+
+=== `showSubResourceProperties`
+
+Show properties inside sub-resource (breakout-reference) nodes:
+
+[source,yaml]
+----
+showSubResourceProperties: true
+----
+
+== Legend Configuration
+
+Control the legend box that appears in generated diagrams:
+
+[source,yaml]
+----
+legend:
+  includeLegend: true
+  mandatoryPropertyNote: " <size:10>(1) : Mandatory property"
+  legendSequence:
+    - "<<Pivot>>"
+    - "<<SubResource>>"
+    - "<<Ref>>"
+    - "<<BreakoutNode>>"
+    - "<<DiscriminatorNode>>"
+    - "<<Enumeration>>"
+  legendEntries:
+    "<<Enumeration>>":
+      color: "#E6F5F7"
+      text: "Enumeration"
+    "<<Pivot>>":
+      color: "#FFFFFFF"
+      text: "Resource (entry point)"
+    "<<Ref>>":
+      color: "#FFFFE0"
+      text: "Sub-resource (reference entity)"
+    "<<SubResource>>":
+      color: "#FCF2E3"
+      text: "Sub-resource"
+    "<<BreakoutNode>>":
+      color: "#FADADD"
+      text: "Sub-resource with details in separate diagram"
+    "<<DiscriminatorNode>>":
+      color: "#F2F3F5"
+      text: "Discriminator (oneOf) node"
+----
+
+== Type Mapping
+
+Control how OAS primitive types and formats map to display names in diagrams:
+
+[source,yaml]
+----
+typeMapping:
+  integer: Integer
+  string: String
+  boolean: Boolean
+  number: Number
+
+formatToType:
+  date-time: DateTime
+  date: Date
+  float: Float
+  uri: Uri
+  int32: Integer32
+  int64: Integer64
+  uuid: UUID
+----
+
+== Path Filtering
+
+=== `ignorePaths`
+
+Path segments to ignore during resource discovery:
+
+[source,yaml]
+----
+ignorePaths:
+  - "/listener/"
+----
+
+=== `filterEventsFromDiscovery`
+
+Exclude event-related paths from automatic resource discovery:
+
+[source,yaml]
+----
+filterEventsFromDiscovery: true
+----
+
+[[subset-control]]
 == Diagram Subset Control
 
 === Overview
