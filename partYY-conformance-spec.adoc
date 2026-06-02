@@ -1,0 +1,418 @@
+= Conformance Specification Generation
+
+This guide explains how to use the conformance specification generation tooling to produce TM Forum OpenAPI conformance specification documents in AsciiDoc format.
+
+The conformance pipeline consists of two stages:
+
+. *Conformance data generation* (`conformance-data`) — extracts conformance data from OAS and optional rules, merges with previous conformance YAML, and writes the result.
+. *Conformance specification generation* (`conformance-guide`) — renders the conformance data into a complete AsciiDoc document with resource overviews, attribute tables, operation sections, and notification summaries.
+
+== Conformance YAML
+
+Declares mandatory/optional status for resources, operations, and attributes. This file is both input and output — the tool merges fresh data from the OAS and writes the result back.
+
+[source,yaml]
+----
+conformance:
+  info:
+    x-tmf-id: TMF999
+    x-tmf-name: Widget Management
+  resources:
+    - Widget
+    - Gadget
+  notifications:
+    - WidgetCreateEvent
+  Widget:
+    condition: M          # M = mandatory, empty = optional
+    comment: ""
+    operations:
+      GET:
+        condition: M
+        comment: ""
+      POST:
+        condition: M
+        comment: ""
+    attributes:
+      name:
+        condition: M
+        comment: ""
+      description:
+        condition: ""
+        comment: ""
+    operations-details:
+      POST:
+        mandatory:
+          name:
+            rule: ""
+      PATCH:
+        patchable:
+          name:
+            rule: ""
+        non-patchable:
+          id:
+            rule: ""
+----
+
+Key concepts:
+
+* `condition: M` marks an element as mandatory
+* `condition: ""` (empty) marks it as optional
+* `comment` provides additional context shown in the generated document
+* `rule` in operations-details provides explanation text for POST mandatory / PATCH patchable attributes
+
+== Rules YAML
+
+Controls resource ordering and provides API metadata. Resources appear in the generated document in the order listed here:
+
+[source,yaml]
+----
+api:
+  name: Widget Management API
+  resources:
+    - name: Widget
+      schema: Widget
+      supportedHttpMethods:
+        GET:
+          required: true
+        POST:
+          required: true
+    - name: Gadget
+      schema: Gadget
+----
+
+When a rules file is provided, the tool also discovers discriminator subtypes (e.g., `BasicWidget` and `PremiumWidget` as subtypes of `Widget`) and injects them into the resource list after their parent.
+
+== Running 
+
+The tooling will generate the ```conformance.yaml``` configuration file if that does not exists. This is stage 1.
+The ```conformance.yaml``` can then be updated with conditions and comments as relevant for the API.
+
+The next step is to generate the conformance specification.
+
+When run from the GUI, both stages execute automatically with a single "Generate Conformance" action. The GUI passes a `verbose` flag that controls the level of output detail (see <<Logging Output>>).
+
+== Generation Pipeline
+
+The full pipeline when both stages are combined:
+
+. *Validate* — Input conformance YAML is validated against `tmf.conformance.v1.schema.json` using Ajv. Invalid input aborts with detailed error messages.
+. *Merge with OAS* — A fresh conformance baseline is generated from the OAS and rules, then merged with the input conformance YAML:
+** Human-edited `condition`, `comment`, and `rule` values are carried forward
+** New elements discovered in the OAS get `x-added: <version>` annotations
+** Elements no longer present in the OAS are recorded in `x-removed`
+. *Write back* — The merged conformance YAML is written back to the input file (controlled by `updateConformanceYaml` config)
+. *Parse* — The merged conformance and OAS are parsed into typed data structures
+. *Discover concrete resources* — Discriminator subtypes are discovered from the rules file and injected into the resource list
+. *Order resources* — Resources are ordered per the rules file (or alphabetically if no rules)
+. *Build data model* — Resource overviews, detailed attribute tables, per-operation data, mandatory operation summaries, and notification data are assembled
+. *Render templates* — Mustache templates are rendered to AsciiDoc fragments
+. *Copy and number static files* — Static AsciiDoc section files are copied to the target, with operation files auto-numbered
+
+[[Logging Output]]
+== Logging Output
+
+The conformance tools produce two levels of output depending on the context:
+
+=== Logging Output 
+
+Essential status messages are shown:
+
+[source,text]
+----
+Conformance data written to: documentation/conformance/conformance.yaml
+Conformance specification generated successfully
+----
+
+When conformance auto-update is disabled and changes exist:
+
+[source,text]
+----
+Conformance YAML was not updated automatically
+To enable auto-update, set 'updateConformanceYaml: true' in documentation/conformance/config.yaml
+
+Changes that would be applied:
+  added: Widget.attributes.newField
+  removed: Widget.attributes.oldField
+----
+
+x-removed changes are summarized as counts:
+
+[source,text]
+----
+x-removed: 3 added, 1 reconciled
+----
+
+In verbose mode, full detail is shown including file lists, timing, and expanded x-removed paths:
+
+[source,text]
+----
+Conformance data: documentation/conformance/conformance.yaml (142ms)
+
+Conformance specification: 18 files (287ms)
+  • generated/ResourceConformanceOverview.adoc
+  • generated/ResourceDetailedConformance.adoc
+  • generated/GetOperationConformance.adoc
+  • generated/PostOperationConformance.adoc
+  • generated/PatchOperationConformance.adoc
+  • generated/DeleteOperationConformance.adoc
+  • generated/Environment.adoc
+  • generated/ResourceMandatoryOperations.adoc
+  • generated/NotificationConformanceOverview.adoc
+  • generated/Notice.adoc
+  • target/conformance.adoc
+  • target/config/Environment.adoc
+  • target/config/Copyright.adoc
+  • target/parts/01_Conformance_Introduction.adoc
+  • target/parts/05_Get_Operation_Conformance.adoc
+  • target/parts/06_Post_Operation_Conformance.adoc
+  • target/parts/07_Patch_Operation_Conformance.adoc
+  • target/parts/08_Acknowledgements.adoc
+----
+
+x-removed changes show full paths with summarization:
+
+[source,text]
+----
+x-removed changes:
+  Newly removed:
+    Widget.attributes (3 entries)
+    Gadget.operations.PUT
+  Reconciled (reappeared):
+    Widget.attributes.name
+----
+
+=== Warning Messages
+
+Warnings when issues are detected during generation:
+
+[source,text]
+----
+⚠  2 warning(s):
+  [camelCase] Attribute name "non_standard" is not camelCase (at Widget.attributes.non_standard)
+  [missingSchema] Referenced schema "MissingType" not found (at Gadget.attributes.ref)
+----
+
+Warning types:
+
+[cols="1,3"]
+|===
+| Type | Meaning
+
+| `camelCase`
+| An attribute name doesn't follow camelCase convention
+
+| `missingType`
+| A type reference in the OAS couldn't be resolved
+
+| `missingSchema`
+| A referenced schema wasn't found in `components/schemas`
+|===
+
+Merge warnings appear when human-edited conditions conflict with the regenerated baseline:
+
+[source,text]
+----
+Widget.operations.DELETE: previous condition "M" differs from generated "". Carrying forward previous value.
+Gadget.attributes.status: new OAS marks as mandatory (M), previous had "". Using new mandatory value.
+----
+
+== Configuration
+
+The conformance-spec-gen tool ships with sensible defaults. Override settings by passing one or more `--config` files (YAML or JSON).
+
+=== Key Configuration Options
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `operationsOrder`
+| `string[]`
+| `[GET, POST, PATCH, PUT, DELETE]`
+| Order of operations in the document
+
+| `resourceMapping`
+| `map`
+| `{EventSubscription: Hub}`
+| Rename resources in the output
+
+| `excludedResources`
+| `string[]`
+| `[EventSubscription, Hub]`
+| Resources to omit from the conformance overview
+
+| `nonPatchable`
+| `map`
+| `{@type: ..., @baseType: ..., @schemaLocation: ...}`
+| Attributes that are always non-patchable, with annotation text
+
+| `removeSectionsForOptionalOperations`
+| `boolean`
+| `true`
+| Omit document sections for operations with no mandatory resources
+
+| `deduplicateAttributeStructures`
+| `boolean`
+| `true`
+| Deduplicate reused attribute structures with cross-references
+
+| `updateConformanceYaml`
+| `boolean`
+| `true`
+| Write merged conformance back to the input file
+
+| `mandatoryOperationsWithComments`
+| `boolean`
+| `true`
+| Include "Comments" column in mandatory operations tables
+
+| `iprMode`
+| `string`
+| `RAND`
+| IPR mode string for the document header
+|===
+
+=== Config File Format
+
+Config files use a mix of direct keys and legacy namespaced keys for backward compatibility:
+
+[source,yaml]
+----
+# Add extra non-patchable attributes (shallow-merged with defaults)
+"conformance.nonPatchable":
+  "@type": "@type is immutable"
+  "@baseType": "@baseType is immutable"
+  "@schemaLocation": "@schemaLocation is immutable"
+  "id": "id is server-generated"
+
+# Override IPR mode
+"conformance.iprMode": "RF"
+
+# Disable comments column in mandatory operations tables
+mandatoryOperationsWithComments: false
+
+# Disable attribute structure deduplication
+deduplicateAttributeStructures: false
+
+# Enable/disable conformance YAML write-back
+updateConformanceYaml: true
+
+# Reorder operations (e.g., POST first)
+default_conformance:
+  layout:
+    operations:
+      - POST
+      - GET
+      - PATCH
+      - PUT
+      - DELETE
+----
+
+=== Config File Key Mapping
+
+[cols="2,2,2"]
+|===
+| Config file key | Internal property | Merge behavior
+
+| `conformance.nonPatchable`
+| `nonPatchable`
+| Shallow merge (user entries added/overwritten)
+
+| `conformance.iprMode`
+| `iprMode`
+| Replace
+
+| `mandatoryOperationsWithComments`
+| `mandatoryOperationsWithComments`
+| Replace
+
+| `deduplicateAttributeStructures`
+| `deduplicateAttributeStructures`
+| Replace
+
+| `updateConformanceYaml`
+| `updateConformanceYaml`
+| Replace
+
+| `default_conformance.layout.operations`
+| `operationsOrder`
+| Replace
+|===
+
+Multiple config files can be passed; they are applied in order (last wins).
+
+== Conformance YAML Merge Behavior
+
+The merge engine preserves human work while keeping the conformance in sync with the OAS:
+
+=== What is preserved from the previous conformance:
+
+* `condition` values (human judgment on mandatory/optional)
+* `comment` text
+* `rule` text in operations-details
+
+=== What comes from the fresh OAS baseline:
+
+* New resources, operations, attributes, and notifications (marked with `x-added: <version>`)
+* Structural changes (new discriminator subtypes, renamed fields)
+
+=== What gets recorded in `x-removed`:
+
+* Resources that existed in the previous conformance but are no longer present in the OAS
+* Attributes that were removed from a schema
+* Operations that were removed from a resource's paths
+
+=== Conflict resolution:
+
+* When the new OAS marks something as mandatory (`M`) but the previous had a different condition, the *new mandatory value takes precedence* (with a warning)
+* When the previous has a non-empty condition that differs from the generated one but neither is `M`, the *previous value is carried forward* (human judgment preserved, with a warning)
+
+When write-back is suppressed and changes exist, the tool outputs a diff summary showing what would have been changed. This is useful for dry-run scenarios or CI pipelines where you want to detect drift without modifying files.
+
+== Output Structure
+
+The generator produces files in two directories:
+
+=== Generated Target Directory
+
+Contains AsciiDoc fragments regenerated on every run:
+
+[source,text]
+----
+generated/
+├── ResourceConformanceOverview.adoc
+├── ResourceDetailedConformance.adoc
+├── GetOperationConformance.adoc
+├── PostOperationConformance.adoc
+├── PatchOperationConformance.adoc
+├── PutOperationConformance.adoc
+├── DeleteOperationConformance.adoc
+├── ResourceMandatoryOperations.adoc
+├── NotificationConformanceOverview.adoc
+├── Environment.adoc
+└── Notice.adoc
+----
+
+=== Target Directory
+
+Contains the main document, configuration files (written only on first generation), and numbered parts:
+
+[source,text]
+----
+target/
+├── conformance.adoc                          # Main document (includes generated fragments)
+├── config/
+│   ├── Environment.adoc                      
+│   └── Copyright.adoc                        
+└── parts/
+    ├── 01_Conformance_Introduction.adoc
+    ├── 02_Resources_Model_Conformance.adoc
+    ├── 03_Notifications_Model_Conformance.adoc
+    ├── 04_Operations_Conformance.adoc
+    ├── 05_Get_Operation_Conformance.adoc
+    ├── 06_Post_Operation_Conformance.adoc
+    ├── 07_Patch_Operation_Conformance.adoc
+    └── 08_Acknowledgements.adoc
+----
+
+NOTE: Operation section files (`05_`, `06_`, etc.) are only generated for operations that have at least one mandatory resource (when `removeSectionsForOptionalOperations: true`). Numbering is sequential starting from `filesToNumberStart` (default: 5).
