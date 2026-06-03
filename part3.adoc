@@ -148,7 +148,7 @@ This automation reduces manual setup errors and accelerates onboarding for new c
 image::images/part3-create-branch.png[Workflow Dispatch,600,auto,align="center"]
 . Trigger the workflow. GitHub Actions will automatically:
 .. Create a new branch with the naming convention: `feature/TMF629_Customer_v5.0.x`
-.. Set up all relevant sub-directories and files, including the `examples` folder and default configuration.
+.. Set up the default configuration file (`config.yaml`) in the correct directory structure for your API
 . Once the workflow completes, your new branch will be available in the repository, ready for development in Codespaces or your local environment.
 
 NOTE: Always use the automated workflow to create new feature branches. This ensures that all required files and structure are present, and that your branch adheres to TMForum naming and organizational standards.
@@ -941,8 +941,6 @@ Examples are crucial for API usability. Verify:
 
 * **Create events**: Payload shows the complete entity
 * **Attribute change events**: Payload shows only `@` properties, `id`, `href`, and changed properties
-* **Status change events**: Payload shows only `@` properties, `id`, `href`, and the changed status/state value
-* **Delete events**: Payload shows only `@` properties, `id`, `href`
 
 **PATCH Operation Examples:**
 
