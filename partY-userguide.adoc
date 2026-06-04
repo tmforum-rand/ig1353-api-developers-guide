@@ -1,0 +1,393 @@
+= User Guide Generation 
+
+The user guide generator reads an OpenAPI specification, a rules YAML file, and an optional diagrams YAML manifest, then produces a complete AsciiDoc user guide document including:
+
+* Resource description pages with field tables and sub-resource detail
+* Resource diagrams (when a `diagrams.yaml` is provided)
+* Operation pages (GET, POST, PATCH, PUT, DELETE) with mandatory attributes, patchable/non-patchable tables, and request/response samples
+* Notification documentation
+
+== Generation Pipeline
+
+. *Load configuration* — Embedded defaults + user config files merged in order
+. *Parse inputs* — OpenAPI spec, rules YAML, and diagrams YAML are parsed
+. *Filter resources* — Resources in `excludedResources` are removed; remaining resources are ordered per the rules file
+. *Discover discriminator subtypes* — Concrete types from discriminator mappings are injected into the document resource list
+. *Build per-resource data* — For each resource: field descriptions, sub-resource details, operation data (mandatory attributes, patchable/non-patchable, samples), notification associations
+. *Generate per-resource `.adoc` files* — One `.adoc` per resource rendered from the resource template
+. *Generate per-resource `_diagram.adoc` files* — Diagram references rendered with filtering applied (see diagram subset control)
+. *Render aggregate templates* — `Resources.adoc`, `Operations.adoc`, `Notifications.adoc`, `Environment.adoc`, `Notice.adoc`
+. *Render target templates* — Main document template, `config/Environment.adoc`, `config/Copyright.adoc` (only written if not already present)
+. *Copy static files* — Section part files and notification pattern images
+
+== Logging Output
+
+[source,text]
+----
+User guide generated: 42 files (312ms)
+  • generated/Widget.adoc
+  • generated/Widget_diagram.adoc
+  • generated/Gadget.adoc
+  • generated/Gadget_diagram.adoc
+  • generated/Resources.adoc
+  • generated/Operations.adoc
+  • generated/Notifications.adoc
+  • generated/Environment.adoc
+  • generated/Notice.adoc
+  • target/userguide.adoc
+  • target/config/Environment.adoc
+  • target/config/Copyright.adoc
+  • target/parts/01_Introduction.adoc
+  • target/parts/02_UseCases.adoc
+  • ...
+----
+
+=== Warnings
+
+Warnings are collected during generation and reported alongside the result. Diagram filtering warnings indicate which sub-resource diagrams were excluded:
+
+[source,text]
+----
+Diagram filter (diagramSubsets): Widget — excluded 5 sub-resource diagram(s): Characteristic, ContactMedium, Feature, Intent, PlaceRefOrValue
+Diagram filter (diagramExclusions): Gadget — excluded 2 sub-resource diagram(s): Characteristic, ContactMedium
+----
+
+== Configuration
+
+The tool ships with defaults in `config/defaults.yaml`. Override settings by passing one or more `--config` files.
+
+=== Resource Filtering
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `excludedResources`
+| `string[]`
+| `[EventSubscription, Hub]`
+| Resources to omit entirely from the user guide
+
+| `resourceMapping`
+| `map`
+| `{EventSubscription: Hub}`
+| Maps OAS schema names to API resource names
+|===
+
+Config file key: `userguide::excludedResources` (replaces), `resourceMapping` (shallow merge)
+
+=== Display Format
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `imageFormat`
+| `string`
+| `svg`
+| Default diagram image format (`svg`, `png`, `puml`)
+
+| `typeMapping`
+| `map`
+| `{integer: Integer, string: String, ...}`
+| Maps OAS base types to display names
+
+| `formatToType`
+| `map`
+| `{date-time: DateTime, date: Date, ...}`
+| Maps OAS format values to display names
+
+| `truncateEnumsTrigger`
+| `number`
+| `50`
+| Truncate enum lists when more values than this
+
+| `truncateEnumsCount`
+| `number`
+| `40`
+| Number of enum values shown before truncation
+
+| `includeMetaProperties`
+| `boolean`
+| `true`
+| Include `@type`, `@baseType`, `@schemaLocation` in property tables
+
+| `insertSoftBreakHints`
+| `boolean`
+| `true`
+| Insert zero-width spaces for better text wrapping in table columns
+|===
+
+=== Soft Break Hints
+
+Fine-grained control over where soft break markers are inserted in generated prose:
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `softBreakHints.marker`
+| `string`
+| `"\u200B"` (zero-width space)
+| Character inserted at break points
+
+| `softBreakHints.separatorChars`
+| `string`
+| `"/_\\-."`
+| Characters after which a break marker is inserted
+
+| `softBreakHints.splitCamelCase`
+| `boolean`
+| `true`
+| Insert marker at camelCase boundaries (e.g., `productOrder`)
+
+| `softBreakHints.splitAlphaNumeric`
+| `boolean`
+| `true`
+| Insert marker at alpha-numeric boundaries (e.g., `Type2`)
+|===
+
+=== Simple Types (Sub-Resource Filtering)
+
+Types matching these patterns are shown inline in property tables but never rendered as sub-resource sections:
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `simpleTypes`
+| `string[]`
+| `[TimePeriod, Money, Quantity, Duration, ...]`
+| Explicit type names treated as simple
+
+| `simpleEndings`
+| `string[]`
+| `[Type, Error]`
+| Suffixes that mark types as simple
+
+| `nonSimpleEndings`
+| `string[]`
+| `[RefType, TypeRef, RoleType]`
+| Exceptions to `simpleEndings`
+|===
+
+=== Operations and Rules Integration
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `operationsOrder`
+| `string[]`
+| `[GET, POST, PATCH, PUT, DELETE]`
+| Order of operations in the document
+
+| `includeAllPatchableFromRules`
+| `boolean`
+| `true`
+| Include all patchable attributes from rules, even if not in OAS PATCH schema
+
+| `rulesSamplesBeforeAPI`
+| `boolean`
+| `true`
+| Prefer sample values from rules file over OAS samples
+
+| `useResourceSampleFallback`
+| `boolean`
+| `true`
+| Use convention-based file lookup for resource sample files
+|===
+
+=== Cross-References
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `useResourceCrossReferences`
+| `boolean`
+| `true`
+| Generate `<<ResourceName>>` cross-references for sub-resource types
+
+| `useDiagramCrossReferences`
+| `boolean`
+| `true`
+| Generate cross-references to diagram sections
+|===
+
+=== Meta Properties and Non-Patchable
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `metaProperties`
+| `string[]`
+| `[@type, @baseType, @schemaLocation]`
+| Properties given special "meta" treatment
+
+| `nonPatchable`
+| `map`
+| `{@type: ..., @baseType: ..., @schemaLocation: ...}`
+| Attributes always shown as non-patchable with annotation text
+
+| `specialNonPatchable`
+| `boolean`
+| `true`
+| Apply special annotation logic for inherited immutable properties
+|===
+
+Config file key: `userguide::metaProperties` (replaces)
+
+=== Diagram Subset Control
+
+Control which breakout diagrams appear per resource. See the dedicated link:USER_GUIDE.md[Diagram Subset Control guide] for full details.
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `diagramSubsets`
+| `map<resource, string[]>`
+| `{}`
+| Whitelist: include only these sub-resource diagrams
+
+| `diagramExclusions`
+| `map<resource, string[]>`
+| `{}`
+| Blacklist: exclude these sub-resource diagrams
+
+| `globalDiagramExclusions`
+| `string[]`
+| `[]`
+| Exclude these sub-resource types from all resources
+|===
+
+=== Document Metadata
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `iprMode`
+| `string`
+| `RAND`
+| IPR mode for the document header
+
+| `metaData`
+| `string[]`
+| `[RELEASE, REVISION, IPR-MODE, STATUS, ...]`
+| Keys extracted from existing user guide for carry-forward
+
+| `allowedInfo`
+| `string[]`
+| `[x-api-id, x-parent-api, ...]`
+| OAS `info` x-fields included in document metadata
+|===
+
+== Config File Format
+
+User config files use a mix of direct keys and namespaced keys for backward compatibility:
+
+[source,yaml]
+----
+# Exclude additional resources (replaces default list)
+"userguide::excludedResources":
+  - EventSubscription
+  - Hub
+  - Monitor
+
+# Add custom resource mappings (shallow merged)
+resourceMapping:
+  EventSubscription: Hub
+  Monitor: PerformanceMonitor
+
+# Override meta properties (replaces default list)
+"userguide::metaProperties":
+  - "@type"
+  - "@baseType"
+  - "@schemaLocation"
+  - "@referredType"
+
+# Add custom format mappings (shallow merged)
+formatToType:
+  date-time: DateTime
+  duration: Duration
+
+# Reduce enum display
+truncateEnumsCount: 10
+truncateEnumsTrigger: 20
+
+# Customize soft breaks
+insertSoftBreakHints: true
+softBreakHints:
+  marker: "\u00AD"
+  splitCamelCase: true
+  splitAlphaNumeric: false
+
+# Enable convention-based resource sample fallback
+useResourceSampleFallback: true
+
+# Diagram filtering (see dedicated guide)
+diagramSubsets:
+  Widget:
+    - Feature
+    - Characteristic
+
+globalDiagramExclusions:
+  - ContactMedium
+----
+
+Multiple config files can be passed; they are applied in order (last wins for replace behavior, additive for shallow merge).
+
+== Output Structure
+
+=== Generated Target Directory
+
+Contains AsciiDoc fragments regenerated on every run:
+
+[source,text]
+----
+generated/
+├── Widget.adoc                # Per-resource field tables and sub-resource detail
+├── Widget_diagram.adoc        # Per-resource diagram references
+├── Gadget.adoc
+├── Gadget_diagram.adoc
+├── Resources.adoc             # Aggregate resource include list
+├── Operations.adoc            # Aggregate operations documentation
+├── Notifications.adoc         # Aggregate notification documentation
+├── Environment.adoc           # Generated environment metadata
+├── Notice.adoc                # Legal notice
+└── images/
+    ├── NotificationsPattern.svg
+    ├── NotificationsPattern.png
+    └── NotificationsPattern.puml
+----
+
+=== Target Directory
+
+Contains the main document, editable configuration files, and section parts:
+
+[source,text]
+----
+target/
+├── userguide.adoc                        # Main document (includes generated fragments)
+├── config/
+│   ├── Environment.adoc                  # Editable environment/release metadata
+│   └── Copyright.adoc                    # Editable copyright notice
+└── parts/
+    ├── 01_Introduction.adoc
+    ├── 02_UseCases.adoc
+    ├── 03_PolymorphismAndExtensions.adoc
+    ├── 04_Resources.adoc
+    ├── 05_Operations.adoc
+    ├── 06_Common_notifications.adoc
+    └── 07_Acknowledgements.adoc
+----
+
+NOTE: Files in `config/` and `parts/` are only written on first generation. They can be freely edited afterward without being overwritten.
+
+== Tips
+
+* Run diagram generation before user guide generation so that `diagrams.yaml` is available
+* Check for warnings about diagram filtering to verify your `diagramSubsets`/`diagramExclusions` config is working correctly
+* Place your project config file at `documentation/userguide/config.yaml` — the tooling discovers it automatically from that location
