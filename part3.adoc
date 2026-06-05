@@ -130,14 +130,7 @@ NOTE: The generation tools are designed to be run frequently during development 
 
 === Create a Development Branch
 
-To ensure consistency and standardization across all API development efforts, TMForum uses GitHub Actions to automate the creation of feature branches. This approach provides several key benefits:
 
-* **Consistent Folder Structure**: Each new branch is initialized with the required directory layout for the selected API, ensuring that all work is organized and contained within the correct location.
-* **Examples Directory**: An `examples` folder is automatically created, making it easy to add and validate example payloads from the start.
-* **Default Configuration**: A template `config.yaml` file is included to promote repeatable and consistent builds across all APIs.
-* **Naming Conventions**: Branch and directory names are enforced to follow TMForum standards, improving clarity and traceability throughout the repository.
-
-This automation reduces manual setup errors and accelerates onboarding for new contributors.
 
 .How to create a feature branch using GitHub Actions
 
