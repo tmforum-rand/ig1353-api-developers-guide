@@ -128,6 +128,20 @@ NOTE: The generation tools are designed to be run frequently during development 
 
 == How To
 
+=== Create a Development Branch
+
+. Navigate to the repository on GitHub and select the "Actions" tab.
+. Locate the workflow named "Create Feature Branch" (or similar) and click on it.
+. Use the "Run workflow" (workflow dispatch) option to specify the API name, TMF ID, and version for your new branch.
++
+image::images/part3-create-branch.png[Workflow Dispatch,600,auto,align="center"]
+. Trigger the workflow. GitHub Actions will automatically:
+.. Create a new branch with the naming convention: `feature/TMF629_Customer_v5.0.x`
+.. Set up the default configuration file (`config.yaml`) in the correct directory structure for your API
+. Once the workflow completes, your new branch will be available in the repository, ready for development in Codespaces or your local environment.
+
+NOTE: Always use the automated workflow to create new feature branches. This ensures that all required files and structure are present, and that your branch adheres to TMForum naming and organizational standards.
+
 === Creating a CodeSpace
 
 **What is a CodeSpace?**
