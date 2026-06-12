@@ -130,10 +130,6 @@ NOTE: The generation tools are designed to be run frequently during development 
 
 === Create a Development Branch
 
-
-
-.How to create a feature branch using GitHub Actions
-
 . Navigate to the repository on GitHub and select the "Actions" tab.
 . Locate the workflow named "Create Feature Branch" (or similar) and click on it.
 . Use the "Run workflow" (workflow dispatch) option to specify the API name, TMF ID, and version for your new branch.
@@ -934,6 +930,8 @@ Examples are crucial for API usability. Verify:
 
 * **Create events**: Payload shows the complete entity
 * **Attribute change events**: Payload shows only `@` properties, `id`, `href`, and changed properties
+* **Status change events**: Payload shows only `@` properties, `id`, `href`, and status/state changes
+* **Delete events**: Payload shows only `@` properties, `id`, and `href`
 
 **PATCH Operation Examples:**
 
