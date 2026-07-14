@@ -1,56 +1,8 @@
-= User Guide Generation 
+= User Guide Generation — Administrator / Developer Configuration Reference
 
-The user guide generator reads an OpenAPI specification, a rules YAML file, and an optional diagrams YAML manifest, then produces a complete AsciiDoc user guide document including:
+This document covers all configuration options for the user guide generator. It is intended for administrators and developers who need to customize generation behavior.
 
-* Resource description pages with field tables and sub-resource detail
-* Resource diagrams (when a `diagrams.yaml` is provided)
-* Operation pages (GET, POST, PATCH, PUT, DELETE) with mandatory attributes, patchable/non-patchable tables, and request/response samples
-* Notification documentation
-
-== Generation Pipeline
-
-. *Load configuration* — Embedded defaults + user config files merged in order
-. *Parse inputs* — OpenAPI spec, rules YAML, and diagrams YAML are parsed
-. *Filter resources* — Resources in `excludedResources` are removed; remaining resources are ordered per the rules file
-. *Discover discriminator subtypes* — Concrete types from discriminator mappings are injected into the document resource list
-. *Build per-resource data* — For each resource: field descriptions, sub-resource details, operation data (mandatory attributes, patchable/non-patchable, samples), notification associations
-. *Generate per-resource `.adoc` files* — One `.adoc` per resource rendered from the resource template
-. *Generate per-resource `_diagram.adoc` files* — Diagram references rendered with filtering applied (see diagram subset control)
-. *Render aggregate templates* — `Resources.adoc`, `Operations.adoc`, `Notifications.adoc`, `Environment.adoc`, `Notice.adoc`
-. *Render target templates* — Main document template, `config/Environment.adoc`, `config/Copyright.adoc` (only written if not already present)
-. *Copy static files* — Section part files and notification pattern images
-
-== Logging Output
-
-[source,text]
-----
-User guide generated: 42 files (312ms)
-  • generated/Widget.adoc
-  • generated/Widget_diagram.adoc
-  • generated/Gadget.adoc
-  • generated/Gadget_diagram.adoc
-  • generated/Resources.adoc
-  • generated/Operations.adoc
-  • generated/Notifications.adoc
-  • generated/Environment.adoc
-  • generated/Notice.adoc
-  • target/userguide.adoc
-  • target/config/Environment.adoc
-  • target/config/Copyright.adoc
-  • target/parts/01_Introduction.adoc
-  • target/parts/02_UseCases.adoc
-  • ...
-----
-
-=== Warnings
-
-Warnings are collected during generation and reported alongside the result. Diagram filtering warnings indicate which sub-resource diagrams were excluded:
-
-[source,text]
-----
-Diagram filter (diagramSubsets): Widget — excluded 5 sub-resource diagram(s): Characteristic, ContactMedium, Feature, Intent, PlaceRefOrValue
-Diagram filter (diagramExclusions): Gadget — excluded 2 sub-resource diagram(s): Characteristic, ContactMedium
-----
+For an overview of what the tool produces and how to interpret its output, see the link:partY-userguide-user.adoc[End-User Guide].
 
 == Configuration
 
@@ -240,7 +192,7 @@ Config file key: `userguide::metaProperties` (replaces)
 
 === Diagram Subset Control
 
-Control which breakout diagrams appear per resource. See the dedicated link:USER_GUIDE.md[Diagram Subset Control guide] for full details.
+Control which breakout diagrams appear per resource. See the dedicated link:partY-diagrams-user.adoc[Diagram Subset Control guide] for full details.
 
 [cols="2,1,2,4"]
 |===
@@ -338,56 +290,3 @@ globalDiagramExclusions:
 ----
 
 Multiple config files can be passed; they are applied in order (last wins for replace behavior, additive for shallow merge).
-
-== Output Structure
-
-=== Generated Target Directory
-
-Contains AsciiDoc fragments regenerated on every run:
-
-[source,text]
-----
-generated/
-├── Widget.adoc                # Per-resource field tables and sub-resource detail
-├── Widget_diagram.adoc        # Per-resource diagram references
-├── Gadget.adoc
-├── Gadget_diagram.adoc
-├── Resources.adoc             # Aggregate resource include list
-├── Operations.adoc            # Aggregate operations documentation
-├── Notifications.adoc         # Aggregate notification documentation
-├── Environment.adoc           # Generated environment metadata
-├── Notice.adoc                # Legal notice
-└── images/
-    ├── NotificationsPattern.svg
-    ├── NotificationsPattern.png
-    └── NotificationsPattern.puml
-----
-
-=== Target Directory
-
-Contains the main document, editable configuration files, and section parts:
-
-[source,text]
-----
-target/
-├── userguide.adoc                        # Main document (includes generated fragments)
-├── config/
-│   ├── Environment.adoc                  # Editable environment/release metadata
-│   └── Copyright.adoc                    # Editable copyright notice
-└── parts/
-    ├── 01_Introduction.adoc
-    ├── 02_UseCases.adoc
-    ├── 03_PolymorphismAndExtensions.adoc
-    ├── 04_Resources.adoc
-    ├── 05_Operations.adoc
-    ├── 06_Common_notifications.adoc
-    └── 07_Acknowledgements.adoc
-----
-
-NOTE: Files in `config/` and `parts/` are only written on first generation. They can be freely edited afterward without being overwritten.
-
-== Tips
-
-* Run diagram generation before user guide generation so that `diagrams.yaml` is available
-* Check for warnings about diagram filtering to verify your `diagramSubsets`/`diagramExclusions` config is working correctly
-* Place your project config file at `documentation/userguide/config.yaml` — the tooling discovers it automatically from that location
