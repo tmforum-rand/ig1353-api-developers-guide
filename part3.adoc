@@ -892,9 +892,16 @@ When troubleshooting becomes difficult:
 3. **Test incrementally**: Comment out sections to isolate the problem
 4. **Consult the community**: Use GitHub Issues for tooling problems or JIRA for API-specific questions
 
-=== Governance Checklists
+=== Quality and Governance
 
-Quality assurance is critical for TMForum APIs. These checklists provide quick visual tests to catch common issues before they propagate through the generation process.
+Quality assurance is critical for TMForum APIs. These sections provide a framework to catch common issues before they propagate through the generation process.
+
+==== Automated checks
+
+We have a series of automated checks that are continually being expanded. Run the checks on your pull request by applying the "run-checks" label.
+The checks are run on every commit or label event on a pull request with the run-checks label applied.
+
+To learn more about the checks, or to run them in Codespace or on your local machine, check the `checks/README.md` file in the API repo.
 
 ==== Rules File Quality Checklist
 
