@@ -442,7 +442,34 @@ Describe the operations and notifications for each resource. The following opera
 
 NOTE: There are many opportunities to reference example files for the full resource and operation requests and responses. *These are all optional to the generation of the OAS file itself*. While they will be needed for the full publication of the API, its user guide and CTK - we would recommend focussing on the OAS construction and approval before working on the examples, as changes to the structure and schemas of the API will cause a lot of rework to these examples.
 
-==== JSON-Schemas
+=== Task Resources
+
+TM Forum APIs support something called a "Task Resource", which is described in detail in the API Design Guidelines. From that document:
+
+[quote, API Design Guidelines]
+____
+This section describes the use of Task resources to expose complex operations that are not representable as standard CRUD entity based operations.
+____
+
+The resource name for a taskResource is a verb indicating the action to perform. The resource must also have the indicator `isTask` applied to it.
+
+The following is an example from the Appointment API:
+
+[source,yaml]
+----
+    - name: SearchTimeSlot
+      schema: schemas/Tmf/Customer/SearchTimeSlot.schema.json#SearchTimeSlot
+      isTask: true
+----
+
+Task resources typically support the following methods:
+
+* `POST`: can return 200 (unusual in REST, but expected for tasks), 201, 202, 204 for success responses, including a Location header to the taskResource. The usual error responses are also returnable.
+* `GET/{id}`: to fetch a single taskResource, for example to check on its status or review results. Tasks are usually retained at least until they are complete.
+
+Longer running tasks can make use of polling, the monitor pattern, or notifications to provide updates.
+
+=== JSON-Schemas
 
 The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above as well as each event type named under the `notifications:` section will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files, each defining a JSON object type and representing a business entity, until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
 
@@ -668,7 +695,7 @@ By OAS 3.0, the fragment part should be interpreted as a https://datatracker.iet
 
 `/definitions/<Entity>`
 
-==== Generating an OAS file
+=== Generating an OAS file
 
 Once you have created your rules file and schema definitions, you can generate the OpenAPI Specification (OAS) file using the TMForum tooling.
 
