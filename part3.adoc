@@ -100,7 +100,7 @@ The TMForum API development process follows a structured approach to transform b
 Each API version folder contains:
  - a configuration file, stating which version of the schemas collection and the tools should be used to generate the outputs for this API
  - a rules file, describing the API interface itself and including examples of API usage
- - a conformance profile, describing the expected behaviour of different API payload prooperties (generated once the rules file is complete)
+ - a conformance profile, describing the expected behaviour of different API payload properties (generated once the rules file is complete)
  - documentation for users of the API
 
 During the development phase, a local copy of the schemas collection can be used and edited; these changes are captured into a new version when the pull request is merged.
@@ -426,7 +426,7 @@ resources:
 
 Add an array entry to the resources collection for each resource that is included in your API. The name field dictates the path, in this example `/CustomerBill`.
 
-=== *Notifications*
+=== Notifications
 
 Describe the operations and notifications for each resource. The following operations may suggest these event notifications:
 
@@ -434,7 +434,7 @@ Describe the operations and notifications for each resource. The following opera
 |===
 |Operation |Typical Event Notifications
 |GET | _none_
-|POST | createEvent, statusChangeEvent, 
+|POST | createEvent, statusChangeEvent
 |PATCH | attributeValueChangeEvent
 |DELETE | deleteEvent
 
@@ -442,7 +442,7 @@ Describe the operations and notifications for each resource. The following opera
 
 NOTE: There are many opportunities to reference example files for the full resource and operation requests and responses. *These are all optional to the generation of the OAS file itself*. While they will be needed for the full publication of the API, its user guide and CTK - we would recommend focussing on the OAS construction and approval before working on the examples, as changes to the structure and schemas of the API will cause a lot of rework to these examples.
 
-==== *JSON-Schemas*
+==== JSON-Schemas
 
 The API rules file implicitly makes references to a number of JSON-Schema files. Each resource named under the `resources:` section above as well as each event type named under the `notifications:` section will cause the OAS generator to search in the schema repository (`OAS_Open_API_And_Data_Model/tree/<YourBranch>/schemas`) for a JSON-Schema file fitting the format: `<MyResource>.schema.json`. In parsing _that_ JSON-Schema file, it will follow any `$ref` references to other JSON-Schema files, each defining a JSON object type and representing a business entity, until it has achieved a transitive-closure of all dependent schemas. This dependency graph will then form the `components.schemas` section of the resultant OAS file, so that all references can be resolved within the API specification.
 
@@ -668,7 +668,7 @@ By OAS 3.0, the fragment part should be interpreted as a https://datatracker.iet
 
 `/definitions/<Entity>`
 
-==== *Generating an OAS file*
+==== Generating an OAS file
 
 Once you have created your rules file and schema definitions, you can generate the OpenAPI Specification (OAS) file using the TMForum tooling.
 
@@ -707,11 +707,11 @@ After generation, always review:
 The generation process will fail if there are syntax errors in your rules file or missing schema references, providing immediate feedback on issues that need to be resolved.
 
 
-=== User Guide Deep Dive
+== User Guide Deep Dive
 
 The User Guide is automatically generated from your API rules file and provides comprehensive documentation for API consumers. Understanding its structure helps ensure your API documentation meets professional standards.
 
-==== Structure and Template
+=== Structure and Template
 
 The generated User Guide follows a consistent template:
 
@@ -722,7 +722,7 @@ The generated User Guide follows a consistent template:
 * **Data Models**: Complete schema documentation with examples
 * **Operation Examples**: Request/response examples for each supported operation
 
-==== Examples Integration
+=== Examples Integration
 
 Examples play a crucial role in making APIs accessible:
 
@@ -731,7 +731,7 @@ Examples play a crucial role in making APIs accessible:
 * Error examples illustrate proper error handling
 * All examples are validated against the generated OAS specification
 
-==== Auxiliary Diagrams (Lifecycles)
+=== Auxiliary Diagrams (Lifecycles)
 
 State transition diagrams and lifecycle illustrations help users understand:
 
@@ -743,7 +743,7 @@ State transition diagrams and lifecycle illustrations help users understand:
 These diagrams are typically hand-crafted using PlantUML and integrated into the generated documentation.
 
 [[userguide-cover-page]]
-==== Cover Page
+=== Cover Page
 
 The cover page holds the document control information. The fields used are shown in the table below.
 
@@ -773,11 +773,11 @@ The cover page holds the document control information. The fields used are shown
 
 Update or add the values in the `userguide.adoc` file.
 
-=== Conformance Profile Deep Dive
+== Conformance Profile Deep Dive
 
 The Conformance Profile defines exactly what an API implementation must support to be considered compliant with the TMForum specification.
 
-==== Initial Generation
+=== Initial Generation
 
 The profile is automatically generated from your rules file, particularly:
 
@@ -794,7 +794,7 @@ updateConformanceYaml: true
 
 It is not recommended to commit this change to source control.
 
-==== How to Read the Profile
+=== How to Read the Profile
 
 The conformance profile uses a structured format:
 
@@ -803,7 +803,7 @@ The conformance profile uses a structured format:
 * **MAY requirements**: Optional features that enhance functionality
 * **Test scenarios**: Specific test cases that validate compliance
 
-==== How to Craft a Custom Rule
+=== How to Craft a Custom Rule
 
 When standard patterns don't fit your API requirements:
 
@@ -815,23 +815,23 @@ When standard patterns don't fit your API requirements:
 
 Custom rules should align with TMForum API Design Guidelines while addressing specific domain needs.
 
-==== Cover Page
+=== Cover Page
 
 The conformance profile document includes a cover page with document control information. The fields and format are the same as for the User Guide; see <<userguide-cover-page>> in the User Guide Deep Dive section for details.
 
-=== Configuration File Deep Dive
+== Configuration File Deep Dive
 
 The configuration file is named `config.yaml` and holds options about the API build process rather than the API itself.
 The available configuration options are described in table below:
 
 [cols="2,8"]
 |===
-2+h**|oasTooling**
+2+h|oasTooling
 
 |version
 |Set the tooling version to use, the list of available versions is here (usually use the newest): https://github.com/tmforum-rand/oas-tooling/releases. A value of `latest` may also be used during API development.
 
-2+h|**schemas**
+2+h|schemas
 
 |version
 |Find the available schema collection versions here: https://github.com/tmforum-rand/oas-tooling/releases and update this value when working on a new version of an API. A value of `latest` may also be used during API development.
@@ -842,11 +842,11 @@ The available configuration options are described in table below:
 
 When published, the configuration file does not include `devMode`. It also uses specific versions rather than `latest`.
 
-=== Troubleshooting
+== Troubleshooting
 
 API development can encounter various technical issues. This section provides guidance on common problems and their solutions.
 
-==== Codespace "Express" WebUI Issues
+=== Codespace "Express" WebUI Issues
 
 The Express WebUI provides a user-friendly interface for API generation, but several issues can occur:
 
@@ -863,7 +863,7 @@ The Express WebUI provides a user-friendly interface for API generation, but sev
 * **Location**: Look for `log.log` files in your API directory
 * **Analysis**: Error messages often point to specific lines in your rules file or schema files
 
-==== Common Validation Issues
+=== Common Validation Issues
 
 **Examples Not Validating Against OAS:**
 
@@ -883,7 +883,7 @@ The Express WebUI provides a user-friendly interface for API generation, but sev
 * **Cause**: Incorrect indentation or invalid YAML syntax
 * **Solution**: Use a YAML validator or IDE with YAML support to check syntax
 
-==== Getting Help
+=== Getting Help
 
 When troubleshooting becomes difficult:
 
@@ -892,11 +892,11 @@ When troubleshooting becomes difficult:
 3. **Test incrementally**: Comment out sections to isolate the problem
 4. **Consult the community**: Use GitHub Issues for tooling problems or JIRA for API-specific questions
 
-=== Quality and Governance
+== Quality and Governance
 
 Quality assurance is critical for TMForum APIs. These sections provide a framework to catch common issues before they propagate through the generation process.
 
-==== Automated checks
+=== Automated checks
 
 We have a series of automated checks that are continually being expanded. Run the checks on your pull request by applying the "run-checks" label.
 The checks are run on every commit or label event on a pull request with the run-checks label applied.
@@ -905,7 +905,7 @@ The checks add a comment to your pull request with any areas of concern, so that
 
 To learn more about the checks, or to run them in Codespace or on your local machine, check the `checks/README.md` file in the API repo.
 
-==== Rules File Quality Checklist
+=== Rules File Quality Checklist
 
 As people often start a new rules file with a copy-and-paste from a previous existing file - it is easy for "working errors" to permeate unnoticed. Review these items carefully:
 
@@ -932,7 +932,7 @@ As people often start a new rules file with a copy-and-paste from a previous exi
 * No errors in generation output window
 * No errors in pull request validation checks
 
-==== Schema Files Quality Checklist
+=== Schema Files Quality Checklist
 
 Schema files define the structure of your API data. Common issues include:
 
@@ -955,7 +955,7 @@ Schema files define the structure of your API data. Common issues include:
 * Required fields are appropriate for the entity
 * Data types are correctly specified
 
-==== Examples Quality Checklist
+=== Examples Quality Checklist
 
 Examples are crucial for API usability. Verify:
 
@@ -986,7 +986,7 @@ Examples are crucial for API usability. Verify:
 
 Use these checklists during development and before submitting APIs for review to ensure high quality and consistency.
 
-==== Submitting Your API for Review
+=== Submitting Your API for Review
 
 Please consider the following checklist before submitting your API for review:
 
