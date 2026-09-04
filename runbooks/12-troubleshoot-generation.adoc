@@ -1,0 +1,98 @@
+= Runbook 12: Troubleshoot Generation Failures
+
+== Goal
+
+Diagnose and fix a generation failure or unexpected output in the Express WebUI or command-line tools.
+
+== General Approach
+
+. *Check the logs first*: The `log.log` file in your API directory contains more detail than the WebUI output panel. Open it in the IDE before trying anything else.
+. *Review recent changes*: Use `git diff` to compare your current rules file and schemas with the last working commit. The error is almost always in what changed.
+. *Test incrementally*: Comment out sections of your rules file (resources, notifications, examples references) to isolate which part is failing, then restore and fix.
+. *Ask for help*: Use GitHub Issues for tooling problems, JIRA for API-specific questions.
+
+== Symptom: Express WebUI is Unresponsive or Blank
+
+*Cause*: The oas-tooling container has crashed or the forwarded port connection was lost.
+
+*Fix*:
+
+. Check the PORTS tab for port 3000. If it shows as not running, restart the container:
++
+[source,bash]
+----
+docker restart oas-tooling
+----
+. If restarting does not help, remove and relaunch the container entirely (see xref:11-change-tooling-version.adoc[Runbook 11]).
+. Use the globe icon in the PORTS tab to reopen the WebUI (do not rely on a saved bookmark URL, as the forwarded address changes each session).
+
+== Symptom: Generation Fails with a Parse Error
+
+*Cause*: The rules file contains invalid YAML syntax.
+
+*Fix*:
+
+. Look at the error message for a line number.
+. Check for tab characters (the rules file requires spaces), incorrect indentation, or unquoted strings that contain YAML-special characters (`:`, `{`, `}`).
+. Use a YAML linter (e.g., `yamllint` from the Codespace terminal, or https://www.yamllint.com) to identify the exact problem.
+
+== Symptom: "Schema Not Found" During Generation
+
+*Cause*: A `$ref` path in the rules file or a schema file resolves to a file that does not exist.
+
+*Fix*:
+
+. Note the entity name mentioned in the error.
+. Check the `$ref` value in your rules file — is the path correct relative to the repository root?
+. Check that the target `.schema.json` file exists at that exact path. Filenames are case-sensitive.
+. Check the fragment part: `/definitions/<Entity>` must match the key inside the `definitions` object of the referenced file.
+
+See xref:../reference/02-json-schema-format.adoc[Reference 2] for `$ref` path conventions.
+
+== Symptom: Checklist Tab Shows Errors After Generation
+
+*Cause*: The generated OAS violates TMForum API Design Guidelines constraints enforced by the tooling.
+
+*Fix*:
+
+Each checklist error message identifies the specific field or pattern that is wrong. Common ones:
+
+[cols="2,3", options="header"]
+|===
+|Error pattern |Likely cause and fix
+
+|Missing description on a property |Add a `description` field to that property in the relevant JSON schema file
+|`shortName` does not match pattern |The `shortName` in your rules file contains spaces or special characters — it must match `^[a-zA-Z0-9]{3,}`
+|Duplicate operation |Two resources define the same HTTP method on the same path
+|Missing required field in example |An example payload is missing a field that is `required` in the schema
+|===
+
+// TODO: Expand this table with the full set of checklist error messages and their fixes.
+
+== Symptom: Examples Validation Fails
+
+*Cause*: An example payload does not conform to the generated OAS schema.
+
+*Fix*:
+
+. Note which example file and which field the error refers to.
+. Open the generated OAS file and find the schema for that resource.
+. Compare the schema's `required` list and property types against your example payload.
+. Common culprits: missing required fields inherited from base schemas (`Entity`, `Addressable`), wrong data type (e.g., `integer` where `string` is expected), or an `enum` value that is not in the allowed list.
+
+See xref:09-create-validate-examples.adoc[Runbook 9] for example authoring rules.
+
+== Symptom: User Guide or Conformance Profile Has Wrong Content
+
+*Cause*: The rules file metadata still contains values from the source template.
+
+*Fix*: Work through the metadata checklist in xref:04-create-update-rules-file.adoc[Runbook 4, Step 2]. Regenerate after updating.
+
+== When to Escalate
+
+If you cannot identify the root cause after following the above steps:
+
+. Capture the full content of `log.log`
+. Note the exact error message from the WebUI output panel
+. Note which tooling version you are running (`docker ps` shows the image tag)
+. Open a GitHub Issue in the `oas-tooling` repository with this information

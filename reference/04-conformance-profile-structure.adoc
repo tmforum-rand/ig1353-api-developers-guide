@@ -1,0 +1,77 @@
+= Reference 4: Conformance Profile Structure
+
+The Conformance Profile defines exactly what an API implementation must support to be considered compliant with the TMForum specification. It is generated from the rules file and then optionally hand-edited to add custom rules.
+
+For the generation workflow, see xref:../runbooks/08-generate-conformance-profile.adoc[Runbook 8: Generate and Edit the Conformance Profile].
+
+== Requirement Levels
+
+The profile uses RFC 2119 language:
+
+[cols="1,3", options="header"]
+|===
+|Level |Meaning
+
+|*MUST*
+|Non-negotiable. An implementation that does not satisfy a MUST requirement is non-conformant. These requirements are tested by the CTK.
+
+|*MUST NOT*
+|Non-negotiable prohibition. An implementation that violates a MUST NOT requirement is non-conformant.
+
+|*SHOULD*
+|Strongly recommended. Implementations are expected to satisfy SHOULD requirements unless there is a documented, justified reason not to.
+
+|*MAY*
+|Optional. Implementations may include or omit these features at their discretion.
+|===
+
+== How Requirements Are Derived
+
+The profile is generated directly from the rules file:
+
+[cols="2,3", options="header"]
+|===
+|Rules file input |Generated conformance requirement
+
+|`required: true` on an HTTP method
+|MUST support that operation (GET, POST, etc.)
+
+|`requiredParameters` on POST or PATCH
+|Client MUST include these fields in the request payload
+
+|`parameterRestrictions` on POST or PATCH
+|Client MUST NOT include these fields in the request payload
+
+|Notification event listed in `notifications:`
+|Implementation SHOULD publish these events (specific level may vary per API)
+|===
+
+== Directory Structure
+
+The generated conformance profile files are organised as follows:
+
+  documentation/conformance/
+    conformance.yaml          ← machine-readable source of truth
+    <API>-conformance.adoc    ← generated human-readable document
+    parts/
+      <section>.adoc          ← editable partial documents (one per topic area)
+
+In *protective mode* (the default), the generator updates `conformance.yaml` and the auto-generated sections of the document, but does not touch the `parts/` folder. This preserves manual edits to custom rules.
+
+In *opt-in generation mode* (enabled via `documentation/conformance/config.yaml`), the generator recreates the `parts/` folder contents. See xref:../runbooks/08-generate-conformance-profile.adoc[Runbook 8] for how to enable and use this mode safely.
+
+== Cover Page Fields
+
+The conformance profile cover page uses the same fields as the User Guide. See xref:05-user-guide-template.adoc[Reference 5: User Guide Template] for the field list.
+
+== Custom Rules
+
+When standard generated rules do not capture a specific API requirement, custom rules can be added directly to the relevant `parts/` file. Custom rules must:
+
+* Follow the same MUST/SHOULD/MAY format as generated rules
+* Include a test criterion describing how the CTK or a manual test can verify the rule
+* Be mentioned in the User Guide so API consumers are aware of the requirement
+
+// TODO: Add the exact YAML/AsciiDoc format of a conformance rule entry,
+// so authors have a template to copy when adding custom rules.
+// This should include: rule identifier, requirement level, rule text, test criterion.
