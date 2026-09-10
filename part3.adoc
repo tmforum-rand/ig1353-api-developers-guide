@@ -813,13 +813,16 @@ The profile is automatically generated from your rules file, particularly:
 * Parameter restrictions (specified in `parameterRestrictions`)
 * Required notification events
 
-You can regenerate the conformance profile without losing existing content by creating the file `documentation/conformance/config.yaml` with the line:
+By default, the generator runs in _protective mode_: it updates the automatically-templated sections, but leaves the main document and `parts/` folder untouched, preserving any manual edits. To enable regeneration of the input assets, recreating the parts files and merging existing conformance.yaml file content with a freshly-generated structure — add the following to `documentation/conformance/config.yaml`:
 
 ```yaml
 updateConformanceYaml: true
+processConformanceParts: true
+updateConformanceParts: true
+optInGeneration: true
 ```
 
-It is not recommended to commit this change to source control.
+Do not store this file in source control.  The build output will indicate which mode is active (`[PROTECTIVE_MODE]` or `[OPT_IN_GENERATION]`). `optInGeneration` can also be placed in `documentation/config.yaml` to apply to all doc tools at once.
 
 === How to Read the Profile
 
