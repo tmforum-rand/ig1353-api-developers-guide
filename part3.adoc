@@ -813,13 +813,27 @@ The profile is automatically generated from your rules file, particularly:
 * Parameter restrictions (specified in `parameterRestrictions`)
 * Required notification events
 
-You can regenerate the conformance profile without losing existing content by creating the file `documentation/conformance/config.yaml` with the line:
+=== Regenerate Conformance
+
+Regenerate the conformance profile without losing existing content by creating the file `documentation/conformance/config.yaml` with the line:
 
 ```yaml
 updateConformanceYaml: true
 ```
 
 It is not recommended to commit this change to source control.
+
+=== Conformance Settings
+
+For each conformance entry, there are two parts, condition and comment.
+
+**Condition** is read by tooling and automation to define how the item should be implemented and tested. The valid values for this field are:
+
+* ``""`` or ``O`` means the item is optional
+* ``M`` means the field is mandatory
+* ``M (in response messages)`` is used for mandatory fields that are set by the server and not by the client (such as ``id``)
+
+**Comment** is used to give further information to implementers, but is not parsed or understood by tooling.
 
 === How to Read the Profile
 
