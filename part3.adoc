@@ -797,7 +797,7 @@ optInGeneration: true
 updateConformanceYaml — default false Controls whether the merged conformance YAML is written back to disk. On the very first (initial) generation the file is always written. On subsequent runs, the file is only rewritten when this is true; otherwise the generator leaves the existing YAML untouched and instead reports a diff summary of what would change. Set it to true to enable auto-update of 
 config.yaml.
 
-processConformanceParts — default false Controls how the parts/ folder is handled. When true, the file-copier runs all "consistent mode" operations: migration detection, overwriting stale files, creating missing files, and cleaning up orphaned files. When false, parts processing is skipped and the tool only emits out-of-sync diagnostics telling you to set processConformanceParts: true. Note: it is ignored entirely when removeSectionsForOptionalOperations is true (legacy selective-write mode).
+processConformanceParts — default false Controls how the parts/ folder is handled. When true, the tooling will overwrite stale files, create missing files, and clean up orphaned files. When false, parts processing is skipped and the tool only emits out-of-sync diagnostics telling you to set processConformanceParts: true.
 
 optInGeneration — default false (protective mode) Master switch for "opt-in generation" mode. When false (the default), the tool runs protectively: it only refreshes generated content and metadata, without overwriting existing target template files or the /parts and main document.
 
