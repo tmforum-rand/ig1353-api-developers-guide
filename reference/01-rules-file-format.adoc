@@ -1,0 +1,200 @@
+= Reference 1: Rules File Format
+
+The rules file is a YAML file written in a domain-specific language (DSL) defined by TMForum. It is the primary input to the OAS generator and describes the high-level structure of the API.
+
+For authoring task steps, see xref:../runbooks/04-create-update-rules-file.adoc[Runbook 4: Create or Update the Rules File].
+
+== Top-Level Structure
+
+[source,yaml]
+----
+rulesVersion: 1.0.0
+api:
+  name:        MyAPI
+  shortName:   MyAPI
+  description: MyAPI description
+  tmfId:       TMF123
+  hostUrl:     'https://serverRoot/tmf-api/MyAPI/v5/'
+  version:     5.0.0
+  resources:
+    # Resource definitions go here
+----
+
+== API Metadata Properties
+
+[cols="1,1,1,3", options="header"]
+|===
+|Property |Type |Required |Description
+
+|`name`
+|string
+|Yes
+|Full API name for documentation. Appears in the OAS file as `info.title`. Use Title Case with spaces. Do not include the word "API".
+
+|`shortName`
+|string
+|Yes
+|Short API identifier for code generation and tooling references. Must match the pattern `^[a-zA-Z0-9]{3,}` (no spaces, no special characters).
+
+|`description`
+|string
+|Recommended
+|API description text. Appears in the OAS file as `info.description`. Supports CommonMark Markdown. Avoid non-ASCII characters, copyright text, and embedded version numbers. See the GUIDANCE.md file in this repository for quality guidelines.
+
+|`tmfId`
+|string
+|Recommended
+|TM Forum identifier for this API. Format: `TMFxxx` (three or more digits, e.g., `TMF620`). Used by tooling only; does not appear in the OAS directly.
+
+|`hostUrl`
+|string
+|Recommended
+|Base host URL. Becomes `servers[0].url` in the generated OAS. Use this instead of the legacy `basePath` field.
+
+|`basePath`
+|string
+|No
+|Legacy field from v4 rules files. Ignored in OAS generation. Do not use in new rules files.
+
+|`version`
+|string
+|Recommended
+|API version in https://semver.org[SemVer] format (`major.minor.patch`, e.g., `5.0.0`). Appears as `info.version` in the OAS.
+
+|`resources`
+|array
+|Yes
+|List of resource definitions. See below.
+|===
+
+== Resource Properties
+
+[cols="1,1,1,3", options="header"]
+|===
+|Property |Type |Required |Description
+
+|`name`
+|string
+|Yes
+|Resource name. Becomes the URL path segment and endpoint name in the OAS. Must follow PascalCase (e.g., `CustomerBill`). Usually matches the JSON schema entity name.
+
+|`schema`
+|string
+|Yes
+|Reference to the JSON schema file for this resource, relative to the repository root. Format: `schemas/Tmf/<Domain>/<Entity>.schema.json#/definitions/<Entity>`
+
+|`parent`
+|string
+|No
+|Parent resource name for sub-resources (e.g., a child collection under another resource's path).
+
+|`excludeEndpoints`
+|boolean
+|No
+|If `true`, no HTTP endpoints are generated for this resource. Default: `false`. Useful for abstract types included only in schemas.
+
+|`isAbstract`
+|boolean
+|No
+|If `true`, skips type mapping generation. Default: `false`.
+
+|`isTask`
+|boolean
+|No
+|If `true`, marks the resource as a Task resource (a TMForum pattern for non-CRUD operations). Default: `false`.
+
+|`supportedHttpMethods`
+|object
+|No
+|HTTP method configurations. Keys are method names (`GET`, `POST`, `PATCH`, `DELETE`). See below.
+
+|`notifications`
+|array
+|No
+|Event notification definitions for this resource. See the Notifications section below.
+
+|`examples`
+|array
+|No
+|Example payload references for this resource.
+
+|`extensions`
+|array
+|No
+|Resource extension definitions.
+|===
+
+=== HTTP Method Configuration
+
+Under `supportedHttpMethods`, each method key supports:
+
+[cols="1,1,3", options="header"]
+|===
+|Property |Type |Description
+
+|`required`
+|boolean
+|If `true`, implementations MUST support this operation to be considered conformant. This drives the CTK and the Conformance Profile.
+
+|`requiredParameters`
+|array of strings
+|Property names that the client MUST include in the request payload (POST/PATCH only).
+
+|`parameterRestrictions`
+|array of strings
+|Property names that the client MUST NOT include in the request payload (typically server-assigned fields like `id`, `href`, `status`).
+|===
+
+=== Example Resource Definition
+
+[source,yaml]
+----
+resources:
+  - name: CustomerBill
+    schema: "schemas/Tmf/Customer/CustomerBill.schema.json#/definitions/CustomerBill"
+    supportedHttpMethods:
+      GET:
+        required: true        # <1>
+      POST:
+        required: true
+        requiredParameters:   # <2>
+          - description
+        parameterRestrictions: # <3>
+          - id
+          - href
+          - status
+    notifications:
+      - createEvent
+      - statusChangeEvent
+      - attributeValueChangeEvent
+      - deleteEvent
+----
+
+<1> GET is mandatory in all conformant implementations — will appear as MUST in the Conformance Profile and be tested by the CTK.
+<2> Clients submitting a POST must include a `description` field.
+<3> Clients submitting a POST must NOT include `id`, `href`, or `status` (these are assigned by the server).
+
+== Notifications
+
+The typical mapping from operations to notification events:
+
+[cols="1,2", options="header"]
+|===
+|Operation |Typical Event Notifications
+
+|GET
+|_(none)_
+
+|POST
+|`createEvent`, `statusChangeEvent`
+
+|PATCH
+|`attributeValueChangeEvent`
+
+|DELETE
+|`deleteEvent`
+|===
+
+Each notification name listed in the rules file must have a corresponding event schema file in `schemas/Tmf/<Domain>/Event/`. See xref:02-json-schema-format.adoc[Reference 2: JSON Schema Format] for event schema structure.
+
+NOTE: Notifications are optional for OAS generation but are required for the full publication of the API, including the User Guide and CTK. Focus on getting the OAS structure right before adding notifications if the API is still evolving.

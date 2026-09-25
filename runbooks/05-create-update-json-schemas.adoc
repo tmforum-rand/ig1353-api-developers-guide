@@ -1,0 +1,104 @@
+= Runbook 5: Create or Update JSON Schema Files
+
+== Goal
+
+Place new or updated entity schema files in the correct location in the schema repository, correctly structured so that the OAS generator can resolve all references.
+
+== Prerequisites
+
+* Your Codespace is running (see xref:03-setup-codespace.adoc[Runbook 3])
+* You know which SID domain your entities belong to (see Part 1: TMForum Information Model Basics)
+* You have identified any existing schemas you can reuse via `$ref`
+
+== Steps
+
+=== 1. Identify the Correct Domain Directory
+
+TMForum entities belong to SID domains. Place your schema files in:
+
+  schemas/Tmf/<Domain>/<Entity>.schema.json
+
+Common domains include `Customer`, `Product`, `Service`, `Resource`, `Common`, `Party`. If your entity does not clearly fit an existing domain, raise this in the weekly review before creating a new domain directory.
+
+=== 2. Create the Schema File
+
+Create a new file named `<Entity>.schema.json` in the correct domain directory. Use this structure as a starting point:
+
+[source,json]
+----
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "<Entity>.schema.json",
+  "title": "<Entity>",
+  "definitions": {
+    "<Entity>": {
+      "$id": "#<Entity>",
+      "type": "object",
+      "description": "<Clear, reusable description of the entity>",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A string used to give a name to the <Entity>"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "../Common/Entity.schema.json#/definitions/Entity"
+        }
+      ],
+      "required": ["name"]
+    }
+  }
+}
+----
+
+See xref:../reference/02-json-schema-format.adoc[Reference 2: JSON Schema Format] for the full list of supported attribute types, `$ref` path conventions, and `allOf`/`oneOf` patterns.
+
+=== 3. Write Entity Descriptions Generically
+
+The `description` field on an entity and its properties appears in every API that references that schema. Write descriptions that make sense *without* reference to any specific API or rules file. Avoid phrases like "as used in this API" or "the CustomerBill's Document".
+
+=== 4. Create Event Schema Files (if needed)
+
+If your resource has notifications, you need event and event-payload schema files. These follow a strict naming and location convention:
+
+  schemas/Tmf/<Domain>/Event/<Entity><Event>.schema.json
+  schemas/Tmf/<Domain>/Event/<Entity><Event>Payload.schema.json
+
+// TODO: Add a worked example of a complete event schema pair.
+// See the TODO.txt gap: "Notification event schema authoring guide"
+
+=== 5. Verify References
+
+Check every `$ref` in your new files:
+
+* Paths must be relative to the *referring* file's location (use `../` to navigate up)
+* Every referenced file must actually exist at the resolved path
+* Fragment parts must match `/definitions/<EntityName>` exactly
+
+=== 6. Working with Local Schema Changes (devMode)
+
+If your PR includes changes to the shared schemas collection (not just your API's rules file), you need to enable `devMode` in your `config.yaml`:
+
+[source,yaml]
+----
+schemas:
+  devMode: true
+----
+
+This tells the build to use the local schema files from your branch rather than a pinned published version.
+
+WARNING: Do not merge `devMode: true` into the main branch. Remove or set to `false` before opening your PR. The CI pipeline will flag this if left in.
+
+// TODO: Clarify the full devMode workflow — when schemas changes flow into a new
+// published version, and how to update config.yaml version pins after merge.
+
+== Expected Outcome
+
+All new schema files are in place with correct names, locations, and internal structure. All `$ref` paths resolve correctly. The OAS generator can follow the reference graph from your rules file through to all dependent schemas without errors.
+
+== Common Errors
+
+* *"Schema not found" during generation*: The `$ref` path in your rules file or schema file does not resolve. Check the path is relative to the right starting location (rules file paths are relative to the repo root; schema-to-schema paths are relative to the referring file).
+* *Fragment not found*: The `#/definitions/<Entity>` fragment must exactly match the key in the `definitions` object of the referenced file.
+* *Description copied from another API*: Check that entity descriptions do not reference specific API names or JIRA tickets.

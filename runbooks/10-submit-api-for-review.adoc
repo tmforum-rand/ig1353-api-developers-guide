@@ -1,0 +1,111 @@
+= Runbook 10: Submit Your API for Review (Pull Request)
+
+== Goal
+
+Open a pull request that passes all automated CI checks, so your API can proceed to team review and approval.
+
+== Prerequisites
+
+* OAS file generates cleanly with no errors (xref:06-generate-validate-oas.adoc[Runbook 6])
+* User Guide generates cleanly (xref:07-generate-user-guide.adoc[Runbook 7])
+* Conformance Profile generates cleanly, opt-in config file removed (xref:08-generate-conformance-profile.adoc[Runbook 8])
+* All examples pass validation (xref:09-create-validate-examples.adoc[Runbook 9])
+* Your JIRA issue is updated to *In Review* (xref:01-raise-jira-issue.adoc[Runbook 1])
+
+== Pre-Submission Checklist
+
+Work through this checklist before opening the PR. Every item should be green:
+
+*Express WebUI — Checklist tab*
+
+* [ ] No errors shown after selecting your API
+
+*Express WebUI — Examples tab*
+
+* [ ] No validation errors after running example validation
+
+*Express WebUI — Generation output*
+
+* [ ] No errors in the OAS generation output
+* [ ] No errors in the User Guide generation output
+* [ ] No errors in the Conformance Profile generation output
+
+*Rules file*
+
+* [ ] `name` updated from source template
+* [ ] `tmfId` updated and correct
+* [ ] `version` set to correct SemVer value
+* [ ] All resource names reflect your API, not the source API
+* [ ] Schema references point to your domain directory
+* [ ] `devMode` is absent or `false` in `config.yaml`
+
+*Examples*
+
+* [ ] All `<Entity>Ref` examples include `@referredType`
+* [ ] Notification create events show the complete entity
+* [ ] Notification attribute change events show only `@` properties, `id`, `href`, and changed properties
+* [ ] Notification status change events show only `@` properties, `id`, `href`, and changed status/state
+* [ ] Notification delete events show only `@` properties, `id`, `href`
+* [ ] All four PATCH formats present, each with request and response
+* [ ] All `id` values match the last segment of the corresponding `href`
+* [ ] No placeholder/dummy values remain
+
+*Conformance profile config*
+
+* [ ] `documentation/conformance/config.yaml` is absent or contains no opt-in flags
+
+== Steps
+
+=== 1. Stage and Commit Your Changes
+
+From the IDE terminal in your Codespace:
+
+[source,bash]
+----
+git add <your changed files>
+git commit -m "TMF<NNN> <API Name> v<version>: <brief description of changes>"
+git push origin feature/TMF<NNN>_<APIName>_v<major>.<minor>.x
+----
+
+=== 2. Open the Pull Request
+
+. Go to the repository on GitHub.
+. Click *Compare & pull request* on your branch, or go to the *Pull requests* tab and click *New pull request*.
+. Set the base branch to `v5.0.0-dev` (or the current main development branch — confirm this with the team).
+. Write a PR description that covers:
+** What API this is for and what changed
+** The JIRA issue key (e.g., `Resolves OPENAPI-1234`)
+** Any known limitations or items still in progress
+. Submit the PR.
+
+=== 3. Watch the Automated Checks
+
+The CI pipeline will run validation checks automatically. Monitor the checks at the bottom of the PR page:
+
+* Wait for all checks to complete
+* If any check fails, click through to the log for the error detail
+* Fix the issue, commit to your branch, and the checks will re-run automatically
+
+// TODO: List the specific CI checks that run and what each one validates.
+// This would help developers know which check corresponds to which type of error.
+
+=== 4. Respond to Review Comments
+
+Team members will review the PR and may leave comments. For each comment:
+
+* Address the concern (fix or explain)
+* Commit the fix to your branch
+* Resolve the comment thread once addressed
+
+// TODO: Document the review turnaround expectation and who is responsible
+// for approvals (e.g., does it require one approver, two, a specific editor?).
+// What does "Team Approved" status mean and who sets it?
+
+== Expected Outcome
+
+The PR is open, all automated checks pass, and the PR is assigned to reviewers. Your JIRA issue is in *In Review* status.
+
+== Common Errors
+
+* *CI check fails on first push*: Run through the pre-submission checklist again. The most common causes are a remaining `devMode: true`, a failing example, or a rules file metadata error.
+* *PR targets the wrong base branch*: Close and reopen the PR with the correct base. Do not merge into `main` directly.

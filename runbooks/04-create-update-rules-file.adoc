@@ -1,0 +1,82 @@
+= Runbook 4: Create or Update the Rules File
+
+== Goal
+
+Produce a valid rules file that accurately describes your API's metadata, resources, and notifications, ready for OAS generation.
+
+== Prerequisites
+
+* Your Codespace is running (see xref:03-setup-codespace.adoc[Runbook 3])
+* You know your API name, TMF number, and target version
+* For updates: you have the current rules file open in the IDE
+
+== Steps
+
+=== 1. Start from the Right Template
+
+If creating a new rules file, copy an existing one from another API directory rather than starting from scratch. Choose an API that is structurally similar to yours (similar number of resources, similar operation set).
+
+WARNING: When copying from an existing file, every value carries over silently. Copy-paste errors are the most common source of problems in new rules files. Work through the checklist in step 2 immediately after copying.
+
+=== 2. Update API Metadata
+
+Open the rules file and update the top-level `api:` block. Check each field against this list:
+
+[cols="1,3,1", options="header"]
+|===
+|Field |What to Check |Required
+
+|`name` |Updated to your API name. Follows Title Case with spaces. Does not include the word "API". |Yes
+|`shortName` |Updated. No spaces or special characters. Different from `name` if `name` is longer than two words. |Yes
+|`tmfId` |Set to your assigned TMF number (e.g., `TMF629`). Verify against the folder name. |Recommended
+|`version` |Set to the correct SemVer version (e.g., `5.0.0`). See versioning guidance in xref:../reference/03-config-file-options.adoc[Reference 3]. |Recommended
+|`hostUrl` |Uses the correct URL pattern. Not the legacy `basePath` field. |Recommended
+|`description` |Written for your API. No copyright text. No version/date strings. Plain ASCII. |Recommended
+|===
+
+See xref:../reference/01-rules-file-format.adoc[Reference 1: Rules File Format] for full field definitions.
+
+=== 3. Define Your Resources
+
+For each resource in your API, add an entry to the `resources:` array:
+
+. Add a `name:` — this becomes the URL path segment (e.g., `CustomerBill` → `/customerBill`)
+. Add a `schema:` reference pointing to the correct JSON schema file
+. Add `supportedHttpMethods:` with `required: true` for operations that must exist in all conformant implementations
+. Add `requiredParameters:` for POST/PATCH fields the client must supply
+. Add `parameterRestrictions:` for fields the client must NOT submit (e.g., `id`, `href`, `status`)
+
+Refer to xref:../reference/01-rules-file-format.adoc[Reference 1] for the full resource property list and a worked example.
+
+=== 4. Add Notifications
+
+For each resource, add a `notifications:` block listing the event types that the API should publish:
+
+[cols="1,2", options="header"]
+|===
+|Operation |Typical events to include
+
+|POST |`createEvent`, `statusChangeEvent`
+|PATCH |`attributeValueChangeEvent`
+|DELETE |`deleteEvent`
+|GET |_(none)_
+|===
+
+Each notification entry must match a corresponding event schema file. See xref:05-create-update-json-schemas.adoc[Runbook 5] for creating those files, and xref:../reference/01-rules-file-format.adoc[Reference 1] for the notifications syntax.
+
+=== 5. Save and Verify Syntax
+
+Before generating, verify the YAML syntax is valid:
+
+* Use the IDE's built-in YAML language support (red underlines indicate syntax errors)
+* Alternatively, paste the file content into https://www.yamllint.com or use `yamllint` from the terminal
+
+== Expected Outcome
+
+The rules file is saved, has valid YAML syntax, all metadata fields are correct for your API, and all resources and notifications are defined. You are ready to generate the OAS file (xref:06-generate-validate-oas.adoc[Runbook 6]).
+
+== Common Errors
+
+* *Wrong API name or TMF ID left from the source file*: Work through the metadata checklist (step 2) on every copy-paste.
+* *Schema path not found during generation*: The `schema:` path must be relative to the repository root. Check that the target file exists at that path (see xref:05-create-update-json-schemas.adoc[Runbook 5]).
+* *YAML indentation errors*: The rules file DSL is indentation-sensitive. Use spaces, never tabs.

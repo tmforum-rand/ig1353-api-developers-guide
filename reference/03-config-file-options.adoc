@@ -1,0 +1,90 @@
+= Reference 3: Configuration File (config.yaml) Options
+
+The `config.yaml` file sits in the API version directory and controls how the build tools process your API. It specifies which versions of the OAS tooling and schema collection to use. It does not describe the API itself.
+
+For the published version of an API, `config.yaml` must use specific pinned versions (not `latest`) and must not include `devMode`.
+
+== File Location
+
+  apis/TMF<NNN>_<APIName>/v<major>.<minor>.x/config.yaml
+
+== Options
+
+[cols="1,1,3", options="header"]
+|===
+|Section |Key |Description
+
+|`oasTooling`
+|`version`
+|The version of the OAS tooling to use for generating all outputs. Find available versions at https://github.com/tmforum-rand/oas-tooling/releases. Use `latest` during active development; replace with a specific version tag before submitting a PR.
+
+|`schemas`
+|`version`
+|The version of the shared schemas collection to use. Find available versions at https://github.com/tmforum-rand/oas-tooling/releases. Use `latest` during active development; replace with a specific pinned version before submitting a PR.
+
+|`schemas`
+|`devMode`
+|Optional. Default: `false`. Set to `true` when your PR includes changes to the shared schemas that have not yet been published as a new schemas version. This causes the build to use local schema files from your branch rather than the pinned published version. *Must not be `true` in a merged PR.*
+|===
+
+== Minimal Example (Development)
+
+[source,yaml]
+----
+oasTooling:
+  version: latest
+
+schemas:
+  version: latest
+----
+
+== Example with devMode (Schema Development)
+
+[source,yaml]
+----
+oasTooling:
+  version: latest
+
+schemas:
+  version: latest
+  devMode: true
+----
+
+== Example (Pre-Publication)
+
+[source,yaml]
+----
+oasTooling:
+  version: v8.6.6
+
+schemas:
+  version: v2.3.1
+----
+
+== Versioning Guidance
+
+// TODO: This section needs input from the team.
+// Key questions to answer here:
+//   - When should the API version (in rules file) be bumped major vs minor vs patch?
+//     (e.g., adding a resource = minor? breaking change to schema = major?)
+//   - When does a new schemas version get published, and who does that?
+//   - What is the process for updating a pinned version after a schemas release?
+
+=== API Version (in rules file)
+
+The `version` field in the rules file follows https://semver.org[Semantic Versioning]:
+
+* *Major*: Breaking changes to the API interface (removed operations, incompatible schema changes)
+* *Minor*: Backward-compatible additions (new resources, new optional fields)
+* *Patch*: Non-functional corrections (description fixes, example corrections)
+
+// TODO: Confirm these guidelines against TMForum's actual versioning policy.
+
+=== Tooling and Schema Versions (in config.yaml)
+
+These version pins ensure that the generated outputs remain reproducible. Update them when:
+
+* A new tooling version is released that you want to adopt
+* A new schemas collection version is published that includes changes your API depends on
+
+To change the running tooling version in an active Codespace without updating config.yaml, see xref:../runbooks/11-change-tooling-version.adoc[Runbook 11].

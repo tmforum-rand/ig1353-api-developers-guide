@@ -1,0 +1,64 @@
+= Runbook 1: Raise a JIRA Issue and Locate Your EPIC
+
+// TODO: This runbook needs to be written by someone with current JIRA access.
+// The outline below is based on existing documentation context; all step details
+// need verification against the live TMForum JIRA instance.
+
+== Goal
+
+Know which JIRA EPIC your work belongs to, have a correctly tagged issue open before you write any code, and understand how to find your work in the weekly review dashboards.
+
+== Prerequisites
+
+* You have a TMForum.org account (see Part 1)
+* You have joined the Open APIs project (see Part 1)
+* You have JIRA access: https://projects.tmforum.org/jira
+
+== Steps
+
+=== 1. Find Your EPIC
+
+EPICs group all work items for a single API development effort. To locate yours:
+
+. Log in to JIRA at https://projects.tmforum.org/jira
+. Navigate to the Open APIs project board
+. Use the *EPIC* filter to find the EPIC for your API (search by API name or TMF number)
+. Note the EPIC key (e.g., `OPENAPI-1234`) — you will attach all issues to this EPIC
+
+// TODO: Add screenshots of the JIRA board and EPIC filter
+
+=== 2. Raise a New Issue
+
+. Click *Create* in the top navigation bar
+. Set the *Issue Type* appropriately:
+** Use *Story* for new API features or resource additions
+** Use *Bug* for corrections to an existing API specification
+** Use *Task* for process or documentation work
+. Fill in the *Summary* field with a concise description
+. Set the *Component* to the API name (e.g., `TMF620 Product Catalog`)
+. Link the issue to your EPIC using the *Epic Link* field
+. Assign to yourself if you will be doing the work
+
+=== 3. Update Issue Status During Development
+
+Move your issue through the workflow as you progress:
+
+* *To Do* → *In Progress* when you start work
+* *In Progress* → *In Review* when you open a pull request
+* *In Review* → *Done* when the PR is merged and approved
+
+=== 4. Prepare for the Weekly Review
+
+Technical JIRA issues are reviewed weekly. Before the meeting:
+
+* Ensure your issue status is current
+* Add a comment if the issue is blocked or needs a decision
+* Use JQL to check for related open issues: `project = OPENAPI AND component = "TMF<NNN>" AND status != Done`
+
+== Expected Outcome
+
+You have an open, correctly tagged JIRA issue linked to your API's EPIC. Your work is visible in the weekly dashboard and ready to track through to completion.
+
+== Common Errors
+
+// TODO: Document common JIRA configuration mistakes (wrong component, missing EPIC link, etc.)

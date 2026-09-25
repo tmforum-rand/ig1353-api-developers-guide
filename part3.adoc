@@ -749,7 +749,18 @@ The generated User Guide follows a consistent template:
 * **Data Models**: Complete schema documentation with examples
 * **Operation Examples**: Request/response examples for each supported operation
 
-=== Examples Integration
+==== Diagram Configuration
+
+You can configure the resource diagram generation options by adding a file ``documentation/diagrams/config.yaml`` with the following options available:
+
+* ``ignorePaths`` is an array of API paths that shouldn't generate diagrams (default is ``/listener/``)
+* ``simpleTypes`` is an array of resources that shouldn't show up as an expanded diagram (like Money or Quantity)
+* ``includeAllRulesResources`` is boolean, set this to ``true`` to include every resource from the rules file as a top-level diagram (default is false)
+* ``autoIncludeSubclassResources`` is boolean (default is true) discriminator subtypes are automatically included as top-level diagrams if their parent resource appears in the OAS paths
+* ``includeRulesResourcesMatching`` is an array of values to match against Resource names, which may include regular expressions (e.g "^WsBb")
+* ``excludeRulesResourcesMatching`` is an array of values to match against Resource names, which may include regular expressions (e.g "^Product$")
+
+==== Examples Integration
 
 Examples play a crucial role in making APIs accessible:
 

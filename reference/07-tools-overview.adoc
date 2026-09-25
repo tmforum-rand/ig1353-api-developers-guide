@@ -1,0 +1,74 @@
+= Reference 7: Tools Overview
+
+This page summarises the tools used in the TMForum API development workflow and what each one does.
+
+== OAS Tooling (oas-tooling)
+
+The primary generation tool. Runs as a Docker container inside the Codespace and exposes two interfaces:
+
+*Express WebUI* (port 3000)::
+A browser-based front end for selecting an API and triggering generation of all outputs. The recommended interface for day-to-day development. Includes a Checklist tab (rule validation) and an Examples tab (example payload validation).
+
+*Command-line / npm*::
+Generation can also be triggered from the Codespace terminal. Used when the WebUI is unavailable or when scripting batch operations.
+
+Source and releases: https://github.com/tmforum-rand/oas-tooling
+
+To change the running container version, see xref:../runbooks/11-change-tooling-version.adoc[Runbook 11].
+
+== GitHub Codespaces
+
+A cloud-based development environment (IDE + terminal) that runs directly in the browser against the TMForum API repository. Eliminates local environment setup and corporate firewall issues.
+
+* Backed by an Azure cloud instance
+* Includes pre-installed Node.js, Python, and API tooling
+* Idle instances are suspended and eventually deleted after several days without commits
+
+See xref:../runbooks/03-setup-codespace.adoc[Runbook 3] for setup and usage.
+
+== Express WebUI Tabs
+
+[cols="1,3", options="header"]
+|===
+|Tab |What it Shows
+
+|*API selector (dropdown)*
+|Every directory under `apis/` in the repository. Select your API before using any other tab.
+
+|*Generate* (or equivalent button)
+|Triggers generation of the OAS file, User Guide, Conformance Profile, and Postman collection. Output and errors appear in the panel below.
+
+|*Checklist*
+|Runs constraint checks on the rules file and generated OAS. Every line should be green before submitting a PR.
+
+|*Examples*
+|Validates all example payload files against the generated OAS schema. Every validation should pass before submitting a PR.
+|===
+
+// TODO: Verify the exact tab names in the current WebUI — they may differ
+// from what is documented here based on the tooling version.
+
+== GitHub Actions (CI Pipeline)
+
+Automated checks that run on every pull request. They replicate the validation you perform locally in the WebUI but run in a controlled environment against the target branch.
+
+// TODO: List the specific GitHub Actions workflows that run on a PR,
+// what each one checks, and what a failure in each one typically indicates.
+// This would help developers map CI failures to the correct runbook.
+
+== JIRA
+
+Used for tracking API development work items (epics, stories, bugs). See xref:../runbooks/01-raise-jira-issue.adoc[Runbook 1].
+
+== GitHub Issues
+
+Used for tracking tooling and CI/CD problems. If you find a bug or limitation in the OAS tooling, raise a GitHub Issue in the `oas-tooling` repository rather than JIRA.
+
+== Postman
+
+The OAS file is automatically converted to a Postman collection as part of the generation pipeline. The Postman collection is used by vendors and operators to exercise API implementations during conformance testing.
+
+// TODO: Document what the Postman collection is used for in more detail:
+//   - Who uses it (implementors, CTK team, operators)?
+//   - Where is it published alongside the other API artifacts?
+//   - Is there anything the API author needs to do with it beyond generating it?

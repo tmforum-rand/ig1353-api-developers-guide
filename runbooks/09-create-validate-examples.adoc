@@ -1,0 +1,95 @@
+= Runbook 9: Create and Validate Examples
+
+// TODO: This runbook needs significant content. The outline below captures
+// the required tasks; details need to be filled in by a team member with
+// experience authoring examples for TMForum APIs.
+// Key gaps: example directory structure, the example generation tool workflow,
+// and worked examples of all four PATCH formats.
+
+== Goal
+
+Provide realistic example payloads for all resources, operations, and notification events in your API, all of which pass the Express WebUI examples validation without errors.
+
+== Prerequisites
+
+* The OAS file generates cleanly (see xref:06-generate-validate-oas.adoc[Runbook 6])
+* Your Codespace is running (see xref:03-setup-codespace.adoc[Runbook 3])
+* You understand the entity structures in your API (from your rules file and schemas)
+
+== Example Directory Structure
+
+// TODO: Document the exact directory layout for example files.
+// Where do entity examples live relative to the API directory?
+// How are operation examples (request/response pairs) named?
+// How are notification examples named?
+
+== Steps
+
+=== 1. (Optional) Run the Example Generation Tool
+
+The tooling can generate placeholder example files automatically. In the Express WebUI:
+
+// TODO: Document the exact button/step to invoke the example generation tool.
+
+After generation, *replace all placeholder values* with realistic data. Placeholder strings left in submitted examples are a common review failure.
+
+=== 2. Write or Update Entity Examples
+
+For each resource, provide at least one example of the complete entity payload. Requirements:
+
+* All required fields must be present
+* `id` and `href` must be consistent: `id` must equal the last path segment of `href`
+* `@type` must be populated with the entity name
+* `@referredType` must be populated in all `<Entity>Ref` examples
+* Use realistic values, not `"string"` or `"12345"`
+
+=== 3. Write Notification Examples
+
+For each event notification type, the payload content rules are:
+
+[cols="1,3", options="header"]
+|===
+|Event type |Required payload content
+
+|Create event |The *complete* entity, as it exists after creation
+|Attribute value change event |Only `@` properties, `id`, `href`, and the *changed* properties (in JSON Merge Patch format)
+|Status change event |Only `@` properties, `id`, `href`, and the changed `status` or `state` value
+|Delete event |Only `@` properties, `id`, and `href`
+|===
+
+// TODO: Add worked examples of each notification payload type.
+
+=== 4. Write PATCH Examples
+
+// TODO: This is a significant gap. The submission checklist requires "all four
+// PATCH formats, with both request and response for each". The four formats
+// are not defined anywhere in the current documentation.
+// A team member needs to document:
+//   - What the four PATCH formats are (JSON Merge Patch, JSON Patch, and others?)
+//   - The request and response structure for each
+//   - A worked example pair for each format
+
+Provide examples covering all four PATCH formats, each with both a request and a response example.
+
+=== 5. Validate All Examples
+
+. In the Express WebUI, select your API.
+. Open the *Examples* tab.
+. Click to validate examples.
+. Fix any validation errors and re-run until no errors remain.
+
+Validation errors indicate that an example payload does not conform to the generated OAS schema. Common causes:
+
+* A required field is missing from the payload
+* A field value does not match the declared type or format
+* An `$ref` resolves to an unexpected schema
+
+== Expected Outcome
+
+All examples validate without errors in the Express WebUI Examples tab. `id`/`href` values are consistent throughout. No placeholder strings remain. Notification examples follow the payload content rules for each event type.
+
+== Common Errors
+
+* *`id` and `href` inconsistent*: The `id` value must exactly match the final path segment of `href` (everything after the last `/`).
+* *`@referredType` missing from a Ref example*: Every `<Entity>Ref` object must include `@referredType` set to the name of the referred entity type.
+* *Example fails validation but OAS looks correct*: The OAS may contain an `allOf` that imposes additional required fields inherited from a base entity (e.g., `Entity`, `Addressable`). Check those base schemas.
