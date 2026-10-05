@@ -1,0 +1,171 @@
+= Diagram Generation — End-User Guide
+:toc: left
+:toclevels: 3
+:sectnums:
+
+This guide covers the user-facing aspects of diagram generation: understanding how diagrams are structured, what simple types mean, and how to control which diagrams appear in the generated user guide.
+
+For the full configuration reference (complexity thresholds, inheritance handling, legend customization, etc.), see the link:partY-diagrams-admin.adoc[Administrator / Developer Configuration Reference].
+
+== Understanding Diagram Structure
+
+The diagram generator reads an OpenAPI specification and produces PlantUML diagrams for each resource. Each resource gets:
+
+* A *pivot diagram* — the main resource diagram showing the top-level structure
+* Zero or more *sub-resource breakout diagrams* — separate diagrams for complex sub-resources that would make the main diagram too crowded
+
+The tool automatically decides which sub-resources to break out based on complexity analysis. You can override these decisions using the Diagram Subset Control settings described below.
+
+== Simple Types
+
+Simple types are treated as leaf nodes in diagrams — they appear as property type annotations but never get their own boxes or breakout diagrams. This keeps diagrams focused on the meaningful structure.
+
+Types are considered simple if they:
+
+* Are explicitly listed (e.g., `TimePeriod`, `Money`, `Quantity`, `Duration`)
+* Have names ending in certain suffixes (e.g., `StatusType`, `ValidationError`)
+* With exceptions for suffixes like `RefType`, `TypeRef`, `RoleType` which remain full nodes
+
+You don't normally need to change these defaults, but they can be configured — see the link:partY-diagrams-admin.adoc[admin guide] for details.
+
+[[subset-control]]
+== Diagram Subset Control
+
+=== Overview
+
+When generating user guides for APIs with many resources and deep sub-resource hierarchies, the output can contain an overwhelming number of diagrams. The **Diagram Subset Control** feature lets you choose exactly which sub-resource breakout diagrams appear in the generated user guide, on a per-resource or global basis.
+
+The main (pivot) diagram for each resource is always included — filtering only applies to sub-resource breakout diagrams.
+
+==== Background: What Are Sub-Resource Diagrams?
+
+The diagram generator uses complexity analysis to automatically "break out" complex sub-resources into their own separate diagrams. These breakouts are types like `Characteristic`, `ContactMedium`, `Feature`, `PlaceRefOrValue`, `GeographicAddress`, `Intent`, etc. — types with enough internal structure to warrant their own diagram.
+
+Simple types (like `TimePeriod`, `Money`, `Quantity`, `Duration`) and types matching `simpleEndings` patterns (like `*Type`, `*Error`) are already rendered inline as leaf nodes by the diagram generator and never produce breakout diagrams. This feature controls which of the *breakout* diagrams appear in the user guide.
+
+You can see which sub-resources were broken out for each resource by inspecting the `breakoutSequence` section in the generated `diagrams.yaml`.
+
+=== Configuration Keys
+
+Add these to your project YAML config file (passed via `--config` / `-c`):
+
+[options=header]
+|===
+| Key | Type | Description |
+| `diagramSubsets` | `map<resource, string[]>` | Whitelist: include only these sub-resource diagrams |
+| `diagramExclusions` | `map<resource, string[]>` | Blacklist: exclude these sub-resource diagrams |
+| `globalDiagramExclusions` | `string[]` | Exclude these sub-resource types from all resources |
+|===
+
+When none of these keys are set, all diagrams are included (existing default behavior).
+
+=== Usage Examples
+
+The examples below use sub-resource names as they appear in `diagrams.yaml` — these are the complex types that the diagram generator broke out into separate diagrams.
+
+==== Include only specific sub-resource diagrams (whitelist)
+
+For a resource like `CheckServiceQualification` that might have 15+ breakout diagrams, you can restrict to just the most important ones:
+
+```yaml
+diagramSubsets:
+  CheckServiceQualification:
+    - CheckServiceQualificationItem
+    - Service
+    - PlaceRefOrValue
+```
+
+Result: The `CheckServiceQualification` resource will show only its pivot diagram plus diagrams for `CheckServiceQualificationItem`, `Service`, and `PlaceRefOrValue`. All other breakout diagrams (like `GeographicAddress`, `GeographicLocation`, `ContactMedium`, `Intent`, etc.) are excluded.
+
+==== Exclude a few noisy diagrams (blacklist)
+
+When most breakout diagrams for a resource are useful but a few add clutter:
+
+```yaml
+diagramExclusions:
+  Individual:
+    - TaxExemptionCertificate
+    - PartyOrPartyRole
+```
+
+Result: `Individual` will include its pivot plus `Party`, `Characteristic`, and `ContactMedium` diagrams, but *not* `TaxExemptionCertificate` or `PartyOrPartyRole`.
+
+==== Exclude common types globally
+
+Some sub-resource types appear across many resources but add little value as separate diagrams:
+
+```yaml
+globalDiagramExclusions:
+  - ContactMedium
+  - Characteristic
+```
+
+Result: `ContactMedium` and `Characteristic` sub-resource diagrams are excluded from every resource in the user guide. These are common breakout types that often have a similar structure across resources and may not warrant individual diagrams for every resource.
+
+==== Combining all three
+
+```yaml
+diagramSubsets:
+  CheckServiceQualification:
+    - CheckServiceQualificationItem
+    - Service
+    - PlaceRefOrValue
+    - Characteristic
+
+diagramExclusions:
+  QueryServiceQualification:
+    - IntentExpression
+    - GeographicLocationRefOrValue
+
+globalDiagramExclusions:
+  - ContactMedium
+  - Characteristic
+```
+
+- **CheckServiceQualification** uses the whitelist — only `CheckServiceQualificationItem`, `Service`, `PlaceRefOrValue`, and `Characteristic` appear. Note that `Characteristic` is included here even though it's in `globalDiagramExclusions`, because `diagramSubsets` is authoritative and overrides global exclusions.
+- **QueryServiceQualification** excludes `IntentExpression`, `GeographicLocationRefOrValue`, `ContactMedium`, and `Characteristic` (resource + global exclusions combine additively).
+- **All other resources** exclude `ContactMedium` and `Characteristic` globally.
+
+=== Precedence Rules
+
+1. **`diagramSubsets` wins** — If a resource has a `diagramSubsets` entry, that list is the only filter applied. Both `diagramExclusions` and `globalDiagramExclusions` are ignored for that resource.
+2. **Resource-specific inclusion overrides global exclusion** — If `diagramSubsets` for a resource includes a type that's in `globalDiagramExclusions`, the diagram is still included.
+3. **Resource + global exclusions combine** — When no `diagramSubsets` entry exists for a resource, `diagramExclusions` and `globalDiagramExclusions` are merged additively.
+4. **Pivot diagram is always included** — The main resource diagram is never filtered out, regardless of configuration.
+
+=== Cross-Reference Behavior
+
+When a sub-resource diagram is excluded:
+- No anchor or cross-reference link is generated pointing to it.
+- If the same sub-resource type is included for a *different* resource, cross-references will point there instead.
+- If a sub-resource type is excluded from *all* resources, any cross-reference links to it are omitted entirely (no broken links).
+
+=== Logging
+
+When diagrams are filtered, the generator logs which sub-resources were excluded:
+
+```
+Diagram filter (diagramSubsets): CheckServiceQualification — excluded 12 sub-resource diagram(s): GeographicAddress, GeographicLocation, ContactMedium, ...
+```
+
+This helps verify your configuration is working as intended.
+
+=== Relationship to Diagram Generation Config
+
+This feature operates at the **user guide generation** level, not at diagram generation. The diagram generator has its own controls that determine which types become breakout diagrams in the first place:
+
+- **`simpleTypes`** — Types like `TimePeriod`, `Money`, `Quantity` that are always rendered inline (never breakouts).
+- **`simpleEndings`** — Suffixes like `Type`, `Error` that mark types as simple (except `nonSimpleEndings` like `RefType`).
+- **`subResourceConfig`** — Explicit breakout lists per resource used by the diagram generator (e.g., `Service: [Feature, Characteristic, Intent, ...]`).
+- **`complexity`** settings — Control automatic breakout thresholds (`breakoutSubgraphNodes`, `breakoutFanout`, `minBreakoutNodes`).
+
+The diagram subset control feature complements these settings. The diagram generator decides *what* breakout diagrams exist; the user guide generator with diagram subset control decides *which* of those appear in the final document.
+
+=== Tips
+
+- Check `diagrams.yaml` to see which sub-resources are actually available for a resource before configuring filters.
+- Use `diagramSubsets` when you want tight control over exactly which breakout diagrams appear for a resource.
+- Use `diagramExclusions` when most diagrams are useful but a few are noisy.
+- Use `globalDiagramExclusions` for common breakout types that clutter the user guide across many resources (e.g., `ContactMedium`, `Characteristic` when they have similar structures everywhere).
+- An empty `diagramSubsets` list (e.g., `CheckServiceQualification: []`) means "show only the pivot diagram" — useful for resources where only the top-level structure matters.
+- Non-existent resource or sub-resource names in the config are silently ignored, so config files can be shared across multiple API projects.
