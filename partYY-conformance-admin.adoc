@@ -1,0 +1,488 @@
+= Conformance Tooling — Administrator / Developer Configuration Reference
+:toc: left
+:toclevels: 3
+:sectnums:
+
+This document covers all configuration options for the conformance data generation (`conformance-data`) and conformance specification generation (`conformance-guide`) tools. It is intended for administrators and developers who need to customize generation behavior.
+
+For an overview of what the tools produce, how to work with the conformance YAML, and how the merge process works, see the link:partYY-conformance-user.adoc[End-User Guide].
+
+== Conformance Data (`conformance-data`) Configuration
+
+The `conformance-data` tool has a small set of internal defaults. Configuration can be provided via `--config` files (YAML or JSON).
+
+=== Running the Tool
+
+[source,bash]
+----
+# Initial generation (no previous file exists)
+conformance-data --openapi api.yaml --output conformance.yaml --target-directory documentation/conformance
+
+# With rules for resource ordering and metadata
+conformance-data --openapi api.yaml --rules rules.yaml --output conformance.yaml --target-directory documentation/conformance
+
+# Merge with existing conformance (automatic when --previous is provided)
+conformance-data --openapi api.yaml --rules rules.yaml --previous documentation/conformance/conformance.yaml --output conformance.yaml --target-directory documentation/conformance
+
+# With configuration file(s)
+conformance-data --openapi api.yaml --rules rules.yaml --previous conformance.yaml --output conformance.yaml -c config.yaml
+----
+
+=== CLI Options
+
+[cols="2,1,3"]
+|===
+| Option | Required | Description
+
+| `--openapi <file>`
+| Yes
+| Path to the OpenAPI specification YAML file
+
+| `--output <file>`
+| Yes
+| Output filename for the conformance YAML
+
+| `--rules <file>`
+| No
+| Rules YAML file for resource ordering and metadata
+
+| `--previous <file>`
+| No
+| Previous conformance YAML for merge (carries forward human edits)
+
+| `--target-directory <dir>`
+| No
+| Output directory (defaults to `.`)
+
+| `-c, --config <files...>`
+| No
+| One or more config files (YAML or JSON)
+
+| `--complete`
+| No
+| Generate complete template with all fields (even empty ones)
+|===
+
+=== Default Configuration
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `globalsSetByServer`
+| `string[]`
+| `[href, id]`
+| Top-level property names whose values are set by the server — these get a special condition rule
+
+| `setByServerRule`
+| `string`
+| `M (in response messages)`
+| Condition value assigned to `globalsSetByServer` properties
+
+| `optionalInitialResourceCondition`
+| `string[]`
+| `[Hub, ImportJob, ExportJob]`
+| Resource names that receive an empty initial condition instead of `M` during initial generation (no existing conformance.yaml)
+
+| `updateConformanceYaml`
+| `boolean`
+| `false`
+| Whether to write the merged conformance YAML back to the input file
+|===
+
+=== Update Control (`updateConformanceYaml`)
+
+This is the key safety setting. When `false` (the default), the tool performs the merge and reports what would change but does *not* modify the conformance YAML file on disk.
+
+Set in your config file:
+
+[source,yaml]
+----
+updateConformanceYaml: true
+----
+
+When multiple config files are passed, the last value wins.
+
+The tool's CLI output changes based on this setting:
+
+* *Disabled* — shows "Changes that would be applied" as a diff summary
+* *Enabled* — shows "Changes applied" confirming the write
+
+=== Merge Engine Details
+
+The merge engine (`merge-engine.ts`) implements the following algorithm:
+
+. Start with the generated document as the base structure (reflects current OAS)
+. Carry forward human-edited `condition`, `comment`, and `rule` values from the previous conformance
+. Mark new elements with `x-added: <version>`
+. Record removed elements in `x-removed` under the new version key
+. Preserve historical `x-added` and `x-removed` from the previous document
+. Filter stale `x-removed` entries for paths that now exist in generated output (reconciliation)
+
+==== Comment Classification
+
+Comments are classified into three categories during merge:
+
+* *Auto-generated* — starts with `One of:`, `Any of:`, or `Present in subclasses:` followed by bullet items only; fully regenerated each run
+* *Manual* — does not start with a known prefix; fully preserved
+* *Mixed* — starts with an auto-generated prefix but has additional text after the bullet items; the prefix portion is regenerated while the manual portion is preserved and appended
+
+==== Condition Carry-Forward Logic
+
+[cols="2,2,3"]
+|===
+| Previous | Generated | Result
+
+| Empty
+| Any
+| Generated value used
+
+| `M`
+| `M`
+| Agree — no change
+
+| Non-M (non-empty)
+| Same
+| Agree — no change
+
+| Non-M (non-empty)
+| Different (not M)
+| Previous carried forward (human judgment, with warning)
+
+| Any (not M)
+| `M`
+| New mandatory takes precedence (with warning)
+|===
+
+=== Schema Validation
+
+The input conformance YAML is validated against `tmf.conformance.v1.schema.json` using Ajv before processing. The schema enforces:
+
+* Resource names must start with uppercase: `^[A-Z][A-Za-z0-9]+`
+* Attribute paths follow the pattern: `^(@[a-zA-Z_]\w*|[a-zA-Z_]\w*(\.[a-zA-Z_]\w*)*(\.@[\w]+)?)$`
+* Operations are limited to: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`
+* `operations-details` supports `POST` (with `mandatory` and `discriminators`) and `PATCH` (with `patchable`, `non-patchable`, and `discriminators`)
+* Each discriminator subtype in POST has `mandatory`; in PATCH has `patchable` and `non-patchable`
+
+=== Diff Summary
+
+When `updateConformanceYaml` is `false` and a previous file exists, the tool computes and displays a diff summary showing added and removed paths. This is useful for CI pipelines to detect drift.
+
+=== x-removed Path Summarization
+
+When many entries share a common parent path, they are summarized for display (threshold: 5 entries under the same parent):
+
+[source,text]
+----
+Widget.attributes (3 entries)     # Instead of listing each attribute
+Gadget.operations.PUT             # Single entries shown individually
+----
+
+---
+
+== Conformance Specification (`conformance-guide`) Configuration
+
+The `conformance-guide` tool ships with defaults in `config/defaults.yaml`. Override settings by passing one or more `--config` files.
+
+=== Running the Tool
+
+[source,bash]
+----
+conformance-guide \
+  --openapi api.yaml \
+  --conformance documentation/conformance/conformance.yaml \
+  --generated-target-directory documentation/conformance/generated \
+  --target-directory documentation/conformance/target \
+  --output conformance.adoc \
+  --rules rules.yaml \
+  -c config.yaml
+----
+
+=== CLI Options
+
+[cols="2,1,3"]
+|===
+| Option | Required | Description
+
+| `--openapi <file>`
+| Yes
+| Path to the OpenAPI specification YAML file
+
+| `--conformance <file>`
+| Yes
+| Path to the conformance YAML file
+
+| `--generated-target-directory <dir>`
+| Yes
+| Output directory for generated AsciiDoc fragments
+
+| `--target-directory <dir>`
+| Yes
+| Output directory for the main document and editable parts
+
+| `--output <file>`
+| Yes
+| Main output filename (e.g., `conformance.adoc`)
+
+| `--rules <file>`
+| No
+| Rules YAML file for resource ordering
+
+| `--working-directory <dir>`
+| No
+| Base working directory
+
+| `--defaults <file>`
+| No
+| Custom defaults YAML file
+
+| `-c, --config <files...>`
+| No
+| One or more config files (YAML or JSON)
+
+| `--templates <dir>`
+| No
+| Custom template source directory (defaults to embedded templates)
+|===
+
+=== Key Configuration Options
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `operationsOrder`
+| `string[]`
+| `[GET, POST, PATCH, DELETE]`
+| Order of operations in the generated document
+
+| `resourceMapping`
+| `map`
+| `{EventSubscription: Hub}`
+| Rename resources in the output (maps schema name to display name)
+
+| `excludedResources`
+| `string[]`
+| `[EventSubscription, Hub]`
+| Resources to omit from the conformance document entirely
+
+| `nonPatchable`
+| `map`
+| `{@type: ..., @baseType: ..., @schemaLocation: ...}`
+| Attributes that are always shown as non-patchable, with annotation text
+
+| `specialNonPatchable`
+| `boolean`
+| `true`
+| Apply special annotation logic for inherited immutable properties
+
+| `removeSectionsForOptionalOperations`
+| `boolean`
+| `false`
+| Omit document sections for operations with no mandatory resources
+
+| `deduplicateAttributeStructures`
+| `boolean`
+| `true`
+| Deduplicate reused attribute structures with cross-references instead of repeating them
+
+| `updateConformanceYaml`
+| `boolean`
+| `false`
+| Write merged conformance back to the input file (same behavior as in `conformance-data`)
+
+| `mandatoryOperationsWithComments`
+| `boolean`
+| `true`
+| Include a "Comments" column in mandatory operations tables
+
+| `iprMode`
+| `string`
+| `RAND`
+| IPR mode string for the document header
+
+| `docIdPostfix`
+| `string`
+| `" "`
+| Postfix appended to the document ID
+
+| `resourceOrder`
+| `string`
+| `rules`
+| How to order resources: `rules` (per rules file), `alphabetical`, or `alphabetical-grouped`
+
+| `processConformanceParts`
+| `boolean`
+| `false`
+| Whether to process (copy/number) conformance part files on each run
+
+| `filesToNumberStart`
+| `number`
+| `5`
+| Starting number for auto-numbered operation section files
+|===
+
+=== Resource Ordering
+
+The `resourceOrder` setting controls how resources appear in the generated document:
+
+* *`rules`* (default) — ordered per the rules YAML file. Discriminator subtypes are inserted after their parent.
+* *`alphabetical`* — all resources sorted alphabetically
+* *`alphabetical-grouped`* — sorted alphabetically but with discriminator subtypes grouped after their parent
+
+=== Document Metadata
+
+[cols="2,1,2,4"]
+|===
+| Setting | Type | Default | Description
+
+| `metaData`
+| `string[]`
+| `[RELEASE, REVISION, IPR-MODE, STATUS, ...]`
+| Keys extracted from existing documents for carry-forward
+
+| `allowedInfo`
+| `string[]`
+| `[x-api-id, x-parent-api, x-parent-api-version, ...]`
+| OAS `info` x-fields included in document metadata
+|===
+
+Full `allowedInfo` default list:
+----
+x-api-id, x-parent-api, x-parent-api-version, x-parent-api-id,
+x-generation-date, x-generation-tooling-version, x-generation-data-model-version
+----
+
+=== Template and File Configuration
+
+[cols="2,1,4"]
+|===
+| Setting | Type | Description
+
+| `generatedTemplates`
+| `map`
+| Maps Mustache template paths to output filenames in the generated directory
+
+| `templates`
+| `map`
+| Maps Mustache template paths to output filenames in the target directory (written only on first generation)
+
+| `filesToCopy`
+| `map`
+| Static AsciiDoc files copied to target subdirectories (written only on first generation)
+
+| `filesToNumber`
+| `map`
+| Operation template files that get auto-numbered (e.g., `05_Get_Operation_Conformance.adoc`)
+
+| `filesToNumberStart`
+| `number`
+| Starting number for the auto-numbered files (default: 5)
+
+| `filesToNumberDestination`
+| `string`
+| Subdirectory within target for numbered files (default: `parts`)
+|===
+
+=== Parts Processing (`processConformanceParts`)
+
+When `false` (the default), the generator preserves existing operation part files in `target/parts/` and does not modify them. This allows manual edits to part files to persist.
+
+When `true`, the generator actively manages part files:
+
+* Copies and numbers operation files based on which operations have mandatory resources
+* Removes operation files for operations without mandatory resources (when `removeSectionsForOptionalOperations: true`)
+
+NOTE: When `removeSectionsForOptionalOperations` is `true`, it overrides `processConformanceParts` and always performs legacy-mode selective file writing.
+
+=== Config File Format
+
+Config files use a mix of direct keys and namespaced keys for backward compatibility:
+
+[source,yaml]
+----
+# Add extra non-patchable attributes (shallow-merged with defaults)
+"conformance.nonPatchable":
+  "@type": "@type is immutable"
+  "@baseType": "@baseType is immutable"
+  "@schemaLocation": "@schemaLocation is immutable"
+  "id": "id is server-generated"
+
+# Override IPR mode
+"conformance.iprMode": "RF"
+
+# Disable comments column in mandatory operations tables
+mandatoryOperationsWithComments: false
+
+# Disable attribute structure deduplication
+deduplicateAttributeStructures: false
+
+# Enable/disable conformance YAML write-back
+updateConformanceYaml: true
+
+# Resource ordering strategy
+resourceOrder: alphabetical-grouped
+
+# Reorder operations (e.g., POST first)
+default_conformance:
+  layout:
+    operations:
+      - POST
+      - GET
+      - PATCH
+      - PUT
+      - DELETE
+----
+
+=== Config File Key Mapping
+
+[cols="2,2,2"]
+|===
+| Config file key | Internal property | Merge behavior
+
+| `conformance.nonPatchable`
+| `nonPatchable`
+| Shallow merge (user entries added/overwritten)
+
+| `conformance.iprMode`
+| `iprMode`
+| Replace
+
+| `mandatoryOperationsWithComments`
+| `mandatoryOperationsWithComments`
+| Replace
+
+| `deduplicateAttributeStructures`
+| `deduplicateAttributeStructures`
+| Replace
+
+| `updateConformanceYaml`
+| `updateConformanceYaml`
+| Replace
+
+| `resourceOrder`
+| `resourceOrder`
+| Replace
+
+| `processConformanceParts`
+| `processConformanceParts`
+| Replace
+
+| `default_conformance.layout.operations`
+| `operationsOrder`
+| Replace
+|===
+
+Multiple config files can be passed; they are applied in order (last wins).
+
+=== Pipeline Run Mode
+
+When the `PIPELINE_RUN` environment variable is set to `true`:
+
+* Only the `generated/` folder and metadata in the main document are updated
+* The conformance YAML is *not* written back (regardless of `updateConformanceYaml`)
+* Useful for CI/CD pipelines where only the rendered output needs refreshing without side effects
+
+=== Custom Templates
+
+Pass `--templates <dir>` to provide a custom template source directory. When specified, the generator uses your templates instead of the embedded ones. Template files are Mustache (`.mustache`) and follow the same naming convention as the defaults.
