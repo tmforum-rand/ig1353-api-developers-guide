@@ -243,6 +243,15 @@ docker run -d --restart=always -p 3000:3000 --name oas-tooling \
 
 3. Once the desired tooling version is running successfully, open the "Ports" tab, relaunch the web server/GUI, and perform your testing.
 
+=== Review Pull Request Assets
+
+Each pull request automatically builds the API assets and attaches them so users can retrieve and review them. To download the assets for a pull request:
+
+1. Look at the Checks section (you may need to expand the list)
+2. Click on "API Assets for Review" to download a zip file of assets and HTML API documentation.
+
+For pull requests that include multiple APIs, choose the file(s) of interest from the Check's Summary page.
+
 == Rules File Deep Dive
 
 The TMF API rules file, along with JSON schema files - form the main areas of influence in the construction of a TMF API. Your main activity will be in crafting this rules file together with the associated JSON-Schema files to ensure that the naming and description of entities, properties, operations, notifications and overall structure "hang together" to describe your intensions in agreement with the TMForum API Design Guidelines.
