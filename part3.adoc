@@ -249,6 +249,8 @@ Each pull request automatically builds the API assets and attaches them so users
 
 1. Look at the Checks section (you may need to expand the list)
 2. Click on "API Assets for Review" to download a zip file of assets and HTML API documentation.
++
+image::images/review-api-assets.png[Review API Assets,align="center"]
 
 For pull requests that include multiple APIs, choose the file(s) of interest from the Check's Summary page.
 
