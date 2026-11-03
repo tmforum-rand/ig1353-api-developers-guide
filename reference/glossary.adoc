@@ -1,0 +1,74 @@
+= Glossary and Abbreviations
+
+[cols="1,2,3", options="header"]
+|===
+|Abbreviation |Full Form |Description
+
+|API
+|Application Programming Interface
+|A set of protocols and tools for building software applications
+
+|AsciiDoc
+|AsciiDoc
+|A lightweight markup language for writing technical documentation
+
+|CI/CD
+|Continuous Integration/Continuous Deployment
+|Automated practices for integrating code changes and deploying applications
+
+|CTK
+|Conformance Test Kit
+|TMForum's testing framework to validate API implementations against the Conformance Profile
+
+|EPIC
+|EPIC
+|Large work items in JIRA that group related user stories or tasks for a single API development effort
+
+|IDE
+|Integrated Development Environment
+|Software application providing comprehensive facilities for software development (e.g., Visual Studio Code)
+
+|JIRA
+|JIRA
+|Project management and issue tracking tool from Atlassian, used by TMForum for API work item tracking
+
+|JSON
+|JavaScript Object Notation
+|Lightweight data interchange format used for API request/response payloads and schema definitions
+
+|JQL
+|JIRA Query Language
+|Query language used to search for and filter issues in JIRA
+
+|OAS
+|OpenAPI Specification
+|A specification for describing REST APIs (formerly known as Swagger). TMForum uses OAS 3.0.
+
+|PlantUML
+|PlantUML
+|A tool for creating UML diagrams from text descriptions. Used for auto-generated class diagrams and hand-authored lifecycle diagrams.
+
+|REST
+|Representational State Transfer
+|Architectural style for designing networked applications, on which TMForum Open APIs are based
+
+|RI
+|Reference Implementation
+|Sample code demonstrating how to implement an API
+
+|SID
+|Shared Information/Data Model
+|TMForum's standard information model, which defines the domains and entity types used in API schemas
+
+|TMF
+|TM Forum
+|Global industry association for communications service providers. Develops the Open API standards.
+
+|UML
+|Unified Modeling Language
+|Standardized modeling language for software design, used in the auto-generated API diagrams
+
+|YAML
+|YAML Ain't Markup Language
+|Human-readable data serialization standard used for rules files and configuration files
+|===

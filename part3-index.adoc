@@ -1,0 +1,153 @@
+= TMForum API Developer's Handbook: Part 3 — The API Development Loop
+TM Forum Specification
+Revision
+:Revision: 0.3.0-draft
+:Date: 2025
+:IPR-Mode: RAND
+:TMF-Number: TODO
+:Status: DRAFT
+:Release-Status: Pre-production
+:url-repo: https://github.com/tmforum-rand/ig1353-api-developers-guide
+:doctype: book
+:toc:
+
+== About This Part
+
+This part of the TMForum API Developer's Handbook covers the API development loop: the repeating cycle of tasks that an API author performs to take an API from a JIRA work item through to a published, conformance-tested specification.
+
+It is organised into two sections:
+
+* *Runbooks* — step-by-step task guides, written in the order you will need them
+* *Reference* — format specifications, option tables, and conventions to consult while working
+
+If you are new to the project, read xref:runbooks/00-overview.adoc[The Development Loop Overview] first.
+
+For first-time onboarding (accounts, permissions, tool installation), see xref:part1.adoc[Part 1: Initial Onboarding].
+
+For starting a brand-new API (JIRA EPIC, TMF number, API profile), see Part 2: Starting a New API.
+
+== Runbooks
+
+Runbooks are ordered by where they fall in the development loop. You will return to runbooks 4–9 repeatedly as your API evolves.
+
+[cols="1,3,2", options="header"]
+|===
+|# |Title |When to Use
+
+|xref:runbooks/00-overview.adoc[0]
+|The API Development Loop: Overview
+|Start here — understand the loop before diving in
+
+|xref:runbooks/01-raise-jira-issue.adoc[1]
+|Raise a JIRA Issue and Locate Your EPIC
+|Before any code or files are touched
+
+|xref:runbooks/02-create-development-branch.adoc[2]
+|Create a Development Branch
+|Once per API version effort
+
+|xref:runbooks/03-setup-codespace.adoc[3]
+|Set Up Your Codespace
+|Once per session; also when reopening after idle time
+
+|xref:runbooks/04-create-update-rules-file.adoc[4]
+|Create or Update the Rules File
+|Core development loop — iterative
+
+|xref:runbooks/05-create-update-json-schemas.adoc[5]
+|Create or Update JSON Schema Files
+|Core development loop — iterative
+
+|xref:runbooks/06-generate-validate-oas.adoc[6]
+|Generate and Validate the OAS File
+|After every rules file or schema change
+
+|xref:runbooks/07-generate-user-guide.adoc[7]
+|Generate and Review the User Guide
+|When preparing for review
+
+|xref:runbooks/08-generate-conformance-profile.adoc[8]
+|Generate and Edit the Conformance Profile
+|When preparing for review; when adding custom conformance rules
+
+|xref:runbooks/09-create-validate-examples.adoc[9]
+|Create and Validate Examples
+|When preparing for review
+
+|xref:runbooks/10-submit-api-for-review.adoc[10]
+|Submit Your API for Review (Pull Request)
+|When all outputs are clean and ready
+
+|xref:runbooks/11-change-tooling-version.adoc[11]
+|Change the Tooling Version
+|When switching to a specific oas-tooling release
+
+|xref:runbooks/12-troubleshoot-generation.adoc[12]
+|Troubleshoot Generation Failures
+|When something goes wrong
+|===
+
+== Reference
+
+Reference documents describe the format and options for the files and tools you work with. Consult them while completing a runbook, or when you need to understand a specific field or option in depth.
+
+[cols="1,3,2", options="header"]
+|===
+|# |Title |What It Covers
+
+|xref:reference/01-rules-file-format.adoc[1]
+|Rules File Format
+|Full YAML DSL — all API metadata, resource, and notification fields with types and constraints
+
+|xref:reference/02-json-schema-format.adoc[2]
+|JSON Schema Format
+|Entity schema structure, all attribute types, `$ref` path conventions
+
+|xref:reference/03-config-file-options.adoc[3]
+|Configuration File (config.yaml) Options
+|Tooling version, schema version, devMode
+
+|xref:reference/04-conformance-profile-structure.adoc[4]
+|Conformance Profile Structure
+|MUST/SHOULD/MAY conventions, the `parts/` folder, custom rules format
+
+|xref:reference/05-user-guide-template.adoc[5]
+|User Guide Template Structure
+|What controls each generated section, cover page fields
+
+|xref:reference/06-diagram-config-options.adoc[6]
+|Diagram Configuration Options
+|`documentation/diagrams/config.yaml` — all options with examples
+
+|xref:reference/07-tools-overview.adoc[7]
+|Tools Overview
+|Express WebUI, Codespaces, CI pipeline, JIRA, Postman
+
+|xref:reference/glossary.adoc[—]
+|Glossary and Abbreviations
+|Definitions of all terms and acronyms used in this document set
+|===
+
+== Administrative Appendix
+
+=== Document History
+
+[cols="1,1,2,3", options="header"]
+|===
+|Version |Date |Modified by |Changes
+
+|0.1.0 |18-Mar-2024 |Stephen Harrop |First layout of the basics
+|0.2.0 |17-Apr-2025 |Lutz Bettge |Schema Repository, Schema File details, Reference Format
+|0.3.0 |_(in progress)_ |_(restructure)_ |Separated into runbooks and reference; added stubs for gaps
+|===
+
+=== Acknowledgments
+
+This document was prepared by the members of the TM Forum API team:
+
+* Stephen Harrop, Vodafone, Editor
+* Revathi Sivaji, TM Forum, Contributor
+* Heidi Lobecker, TM Forum, Contributor
+* Uche Uba, TM Forum, Contributor
+* Lutz Bettge, Deutsche Telekom, Contributor
+* Olivier Arnaud, Orange, Contributor

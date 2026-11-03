@@ -1,0 +1,74 @@
+= Runbook 7: Generate and Review the User Guide
+
+== Goal
+
+Produce a complete User Guide document for your API, with the cover page correctly filled in, diagrams rendering correctly, and the document ready for team review.
+
+== Prerequisites
+
+* The OAS file generates cleanly (see xref:06-generate-validate-oas.adoc[Runbook 6])
+* Your Codespace is running (see xref:03-setup-codespace.adoc[Runbook 3])
+
+== Steps
+
+=== 1. Generate the User Guide
+
+. In the Express WebUI, select your API from the dropdown.
+. Click *Generate User Guide*.
+. Review the output panel for any errors or warnings.
+
+=== 2. Fill In the Cover Page
+
+The generated User Guide includes a cover page controlled by fields in `documentation/userguide.adoc`. Open this file and set the following:
+
+[cols="1,3", options="header"]
+|===
+|Field |Value to Set
+
+|`:RELEASE-STATUS:` |`Preview` (during development) or `Production` (when published)
+|`:MATURITY-LEVEL:` |`General availability (GA)`
+|`:TEAM-DATE:` |Date the team approved the document, format: `dd-Mmm-yyyy`
+|`:APPROVAL-STATUS:` |`Team Approved`
+|`:IPR-MODE:` |`RAND`
+|`:VERSION:` |Full API version, e.g. `5.1.2`
+|===
+
+See xref:../reference/05-user-guide-template.adoc[Reference 5: User Guide Template] for a description of all generated sections and what controls their content.
+
+=== 3. Review the Diagram Output
+
+The User Guide includes auto-generated class diagrams. After generation, open the HTML or PDF output and check:
+
+* All resources appear in diagrams
+* Diagrams are not overcrowded (very large schemas may need `simpleTypes` exclusions)
+* If some resources are missing, they may need to be added via diagram configuration
+
+To configure which resources appear in diagrams, create or edit `documentation/diagrams/config.yaml`. See xref:../reference/06-diagram-config-options.adoc[Reference 6: Diagram Configuration Options].
+
+=== 4. Add Auxiliary Diagrams (if needed)
+
+State transition diagrams and lifecycle illustrations are hand-authored in PlantUML and placed in `documentation/diagrams/`. They are included by the User Guide template automatically if present.
+
+// TODO: Specify the exact file naming convention for auxiliary diagrams and
+// where in the generated User Guide they appear.
+
+=== 5. Review the Generated Document
+
+Open the generated User Guide (HTML or PDF from the output directory) and verify:
+
+* Cover page fields are all populated and correct
+* Table of contents is accurate
+* All resources have descriptions (from your rules file and schema files)
+* Operation descriptions reflect your `requiredParameters` and `parameterRestrictions`
+* Example payloads (if any are present) render correctly
+* No placeholder text remains from a source template
+
+== Expected Outcome
+
+A User Guide document is generated with a correct cover page, all diagrams present, and content accurately reflecting your API. The document is ready to share with reviewers.
+
+== Common Errors
+
+* *Diagram missing a resource*: Check `documentation/diagrams/config.yaml` — the `excludeRulesResourcesMatching` option may be filtering it out, or `includeAllRulesResources` may need to be set to `true`.
+* *Cover page fields show as placeholders*: Ensure `documentation/userguide.adoc` exists and the field values are set (colons on both sides, no extra spaces).
+* *Descriptions are empty*: Entity and attribute descriptions come from the JSON schema files. If they are missing, add `description` fields to the relevant schema properties.

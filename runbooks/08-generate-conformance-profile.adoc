@@ -1,0 +1,83 @@
+= Runbook 8: Generate and Edit the Conformance Profile
+
+== Goal
+
+Produce a Conformance Profile that accurately reflects your API's compliance requirements, with any custom rules added and the document ready for publication.
+
+== Prerequisites
+
+* The OAS file generates cleanly (see xref:06-generate-validate-oas.adoc[Runbook 6])
+* Your Codespace is running (see xref:03-setup-codespace.adoc[Runbook 3])
+
+== Steps
+
+=== 1. Run the Initial Generation (Protective Mode)
+
+By default, the Conformance Profile generator runs in *protective mode*: it updates the automatically-templated sections of the profile but leaves the `parts/` folder and main document untouched, preserving any manual edits.
+
+. In the Express WebUI, select your API.
+. Click *Generate Conformance Profile*.
+. Review the output panel. Confirm it shows `[PROTECTIVE_MODE]`.
+
+On a brand-new API this will create the initial profile structure. On an existing API it will update only the auto-generated sections.
+
+=== 2. Review the Generated Profile
+
+Open the generated conformance profile and check:
+
+* Required operations (those marked `required: true` in your rules file) appear as *MUST* requirements
+* `requiredParameters` appear as mandatory payload fields
+* `parameterRestrictions` appear as prohibited input fields
+* Required notification events are listed
+
+See xref:../reference/04-conformance-profile-structure.adoc[Reference 4: Conformance Profile Structure] for how to interpret MUST/SHOULD/MAY conventions and the `parts/` folder structure.
+
+=== 3. Enable Editing Mode (When Manual Changes Are Needed)
+
+To add custom rules, edit `parts/` content, or regenerate from scratch, create a local configuration file at `documentation/conformance/config.yaml` with the following flags:
+
+[source,yaml]
+----
+updateConformanceYaml: true
+processConformanceParts: true
+updateConformanceParts: true
+optInGeneration: true
+----
+
+WARNING: Do not commit this file to source control. Its presence enables destructive regeneration of the `parts/` folder.
+
+Re-run generation; the output panel should now show `[OPT_IN_GENERATION]`.
+
+=== 4. Add Custom Rules
+
+When the standard conformance patterns do not cover a specific requirement in your API:
+
+. Identify the gap: what behaviour must a conformant implementation exhibit that the generated rules do not capture?
+. In the relevant `parts/` file, add a new rule entry following the format of the surrounding entries.
+. Assign the appropriate requirement level: *MUST* (non-negotiable), *SHOULD* (strongly recommended), or *MAY* (optional).
+. Define a test criterion: how would a CTK test verify this rule?
+. Add a note in the User Guide (xref:07-generate-user-guide.adoc[Runbook 7]) so API consumers are aware of the custom requirement.
+
+// TODO: Add a worked example of a complete custom rule entry in the parts/ format.
+
+=== 5. Lock Down Before PR
+
+Before opening your pull request:
+
+. Delete or empty `documentation/conformance/config.yaml` (the opt-in flags must not be in the submitted branch).
+. Run generation one final time in protective mode to confirm the output is stable.
+. Verify the generated document looks correct.
+
+=== 6. Fill In the Cover Page
+
+The conformance profile cover page uses the same fields as the User Guide cover page. See xref:07-generate-user-guide.adoc[Runbook 7, Step 2] for the field list and format.
+
+== Expected Outcome
+
+A Conformance Profile is generated that accurately captures all required, recommended, and optional behaviours. Any custom rules are clearly documented. The `documentation/conformance/config.yaml` opt-in file is not present in the branch.
+
+== Common Errors
+
+* *Required operations not appearing in the profile*: Check that `required: true` is set correctly under `supportedHttpMethods` in your rules file.
+* *`[OPT_IN_GENERATION]` mode running unintentionally*: The `documentation/conformance/config.yaml` file is still present. Delete it and re-run.
+* *Manual edits to `parts/` files are overwritten*: Opt-in mode was triggered accidentally. Restore from Git and ensure the config file is removed before re-running.

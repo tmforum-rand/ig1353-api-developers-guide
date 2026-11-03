@@ -1,0 +1,63 @@
+= Runbook 6: Generate and Validate the OAS File
+
+== Goal
+
+Produce a clean `openapi.yaml` (OAS file) from your rules file and schemas, with no generation errors and no validation warnings.
+
+== Prerequisites
+
+* Your rules file is complete and YAML-valid (see xref:04-create-update-rules-file.adoc[Runbook 4])
+* All referenced schema files exist (see xref:05-create-update-json-schemas.adoc[Runbook 5])
+* Your Codespace is running with the Express WebUI accessible (see xref:03-setup-codespace.adoc[Runbook 3])
+
+== Steps
+
+=== Option A: Using the Express WebUI (Recommended)
+
+. Open the Express WebUI in your browser (port 3000 in your Codespace).
+. Select your API from the dropdown list. The list shows every directory under `apis/`.
+. Click *Generate OAS*.
+. Watch the output panel for errors and warnings.
+. When generation completes, open the *Checklist* tab and confirm no errors are shown.
+. Open the *Examples* tab and run example validation; confirm no errors.
+
+=== Option B: Using the Command Line
+
+If the WebUI is unavailable or you prefer the terminal:
+
+[source,bash]
+----
+# From the Codespace terminal, navigate to your API directory
+cd /workspaces/OAS_Open_API_And_Data_Model/apis/TMF<NNN>_<APIName>/v<major>.<minor>.x
+
+# Run the generation
+npm run generate
+
+# Check the output for errors; the generated file appears at:
+cat generated/openapi.yaml
+----
+
+=== What to Review in the Generated OAS
+
+After generation, check the following in the output file:
+
+* `info.title` matches your `name` field in the rules file
+* `info.version` matches your `version` field
+* `servers[0].url` is correct (from `hostUrl`)
+* All resources appear as paths under the correct URL segments
+* `components/schemas` contains all your entities and their dependencies
+* No placeholder values remain from the source template (wrong API name, wrong TMF number)
+
+== Expected Outcome
+
+A valid `openapi.yaml` is generated with no errors in the output panel, no errors on the Checklist tab, and no example validation errors. You are ready to generate the User Guide (xref:07-generate-user-guide.adoc[Runbook 7]) and Conformance Profile (xref:08-generate-conformance-profile.adoc[Runbook 8]).
+
+== Common Errors
+
+* *Generation fails immediately*: Check the terminal/log output for YAML parse errors in your rules file. Fix and retry.
+* *"Schema not found"*: A `$ref` path cannot be resolved. See xref:05-create-update-json-schemas.adoc[Runbook 5] for `$ref` path conventions.
+* *Checklist tab shows errors*: These are constraint violations in your rules file (e.g., a required field is missing a description). Each error message identifies the field; fix in the rules file and regenerate.
+* *Examples validation fails*: Your example payloads do not match the generated schema. See xref:09-create-validate-examples.adoc[Runbook 9].
+* *WebUI becomes unresponsive*: Restart the oas-tooling container. See xref:11-change-tooling-version.adoc[Runbook 11] for the restart command, or see xref:12-troubleshoot-generation.adoc[Runbook 12].
+
+NOTE: Keep generation logs (the `log.log` file in your API directory) when troubleshooting — they contain more detail than the WebUI output panel.

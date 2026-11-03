@@ -1,0 +1,78 @@
+= Runbook 11: Change the Tooling Version
+
+== Goal
+
+Switch the `oas-tooling` container running in your Codespace to a specific version, for example to test against a new tooling release or to replicate a known-good state.
+
+== Prerequisites
+
+* Your Codespace is running (see xref:03-setup-codespace.adoc[Runbook 3])
+* You know which version you need (check https://github.com/tmforum-rand/oas-tooling/releases for available versions)
+
+== When to Use This
+
+* You want to test your API against a new tooling release before it becomes the default
+* The current container is in an inconsistent state and needs a clean restart
+* You need to reproduce a generation result from a specific tooling version
+
+== Steps
+
+=== 1. Remove the Existing Container
+
+In the Codespace terminal:
+
+[source,bash]
+----
+docker rm -f oas-tooling
+----
+
+=== 2. Start the Required Version
+
+==== Option A: Using the Provided Script
+
+[source,bash]
+----
+./.devcontainer/library-scripts/start-oas-tooling.sh v8.6.6
+----
+
+Replace `v8.6.6` with the version you need.
+
+==== Option B: Using Docker Directly
+
+[source,bash]
+----
+docker run -d --restart=always -p 3000:3000 --name oas-tooling \
+  -v /workspaces/OAS_Open_API_And_Data_Model/apis/:/home/node/apis \
+  -v /workspaces/OAS_Open_API_And_Data_Model/schemas/:/home/node/schemas \
+  ghcr.io/tmforum-rand/oas-tooling/oas-tooling:v8.6.6
+----
+
+Replace `v8.6.6` with your target version. Using `latest` here fetches whatever is currently tagged as latest on the registry, which may differ from what `config.yaml` specifies.
+
+=== 3. Reopen the Express WebUI
+
+. Click the *PORTS* tab at the bottom of the IDE.
+. Wait for port 3000 to show as *Running*.
+. Click the globe icon next to the forwarded URL to open the WebUI.
+
+=== 4. Update config.yaml (if Publishing)
+
+If you are using a new tooling version for a published API, update the pinned version in `config.yaml`:
+
+[source,yaml]
+----
+oasTooling:
+  version: v8.6.6
+----
+
+See xref:../reference/03-config-file-options.adoc[Reference 3: Configuration File Options] for the full config schema.
+
+== Expected Outcome
+
+The `oas-tooling` container is running at the specified version, the Express WebUI is accessible, and generation works correctly.
+
+== Common Errors
+
+* *Port 3000 does not appear in the PORTS tab*: The container failed to start. Check `docker logs oas-tooling` in the terminal for the error.
+* *Container starts but WebUI shows an error page*: Wait 30 seconds and refresh — the Node.js process inside the container may still be initialising.
+* *`docker rm` fails with "No such container"*: The container was never started or already removed. Skip step 1 and proceed to step 2.
